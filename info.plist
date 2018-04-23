@@ -11,7 +11,7 @@
 	<key>createdby</key>
 	<string>drgrib</string>
 	<key>description</key>
-	<string>Streamlined note searching and creation in Bear</string>
+	<string>Streamlined note searching and creation for Bear using Alfred</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
