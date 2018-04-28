@@ -42,4 +42,7 @@ func TestBearDB(t *testing.T) {
 	tags, err = db.SearchTags("c")
 	comp.MustBeNil(err)
 	Println(tags)
+	recent, err := db.GetRecent()
+	comp.MustBeNil(err)
+	Println(recent)
 }

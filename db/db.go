@@ -29,6 +29,27 @@ const tagQuery = `
 	LIMIT %v
 `
 
+const recentQuery = `
+	SELECT DISTINCT
+		ZUNIQUEIDENTIFIER, ZTITLE 
+	FROM 
+		ZSFNOTE 
+	WHERE 
+		ZARCHIVED=0 
+		AND ZTRASHED=0 
+	ORDER BY 
+		ZMODIFICATIONDATE DESC 
+	LIMIT %v
+`
+
+//////////////////////////////////////////////
+/// Note
+//////////////////////////////////////////////
+
+type Note struct {
+	ID, Title string
+}
+
 //////////////////////////////////////////////
 /// BearDB
 //////////////////////////////////////////////
@@ -50,6 +71,28 @@ func (db BearDB) SearchTags(s string) ([]string, error) {
 	q := Sprintf(tagQuery, s, db.limit)
 	tags, err := db.lite.QueryStrings(q)
 	return tags, err
+}
+
+func toNotes(maps []map[string]string) []Note {
+	notes := []Note{}
+	for _, m := range maps {
+		n := Note{
+			ID:    m["ZUNIQUEIDENTIFIER"],
+			Title: m["ZTITLE"],
+		}
+		notes = append(notes, n)
+	}
+	return notes
+}
+
+func (db BearDB) GetRecent() ([]Note, error) {
+	q := Sprintf(recentQuery, db.limit)
+	maps, err := db.lite.QueryStringMaps(q)
+	if err != nil {
+		return []Note{}, err
+	}
+	notes := toNotes(maps)
+	return notes, err
 }
 
 //////////////////////////////////////////////
