@@ -4,7 +4,28 @@ import (
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/drgrib/alfred-bear/comp"
 )
+
+//////////////////////////////////////////////
+/// BearDB
+//////////////////////////////////////////////
+
+type BearDB struct {
+	lite LiteDB
+}
+
+func NewBearDB() (BearDB, error) {
+	path := comp.Expanduser("~/Library/Containers/net.shinyfrog.bear/Data/Documents/Application Data/database.sqlite")
+	lite, err := NewLiteDB(path)
+	db := BearDB{lite}
+	return db, err
+}
+
+//////////////////////////////////////////////
+/// LiteDB
+//////////////////////////////////////////////
 
 type LiteDB struct {
 	db *sql.DB

@@ -32,3 +32,9 @@ func TestStringQuery(t *testing.T) {
 		Println()
 	}
 }
+
+func TestBearDB(t *testing.T) {
+	db, err := NewBearDB()
+	comp.MustBeNil(err)
+	Println(db)
+}
