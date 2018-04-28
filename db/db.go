@@ -42,6 +42,20 @@ const recentQuery = `
 	LIMIT %v
 `
 
+const titleByIDQuery = `
+	SELECT DISTINCT
+		ZTITLE 
+	FROM 
+		ZSFNOTE 
+	WHERE 
+		ZARCHIVED=0 
+		AND ZTRASHED=0 
+		AND ZUNIQUEIDENTIFIER='%v' 
+	ORDER BY 
+		ZMODIFICATIONDATE DESC 
+	LIMIT %v
+`
+
 //////////////////////////////////////////////
 /// Note
 //////////////////////////////////////////////
@@ -93,6 +107,19 @@ func (db BearDB) GetRecent() ([]Note, error) {
 	}
 	notes := toNotes(maps)
 	return notes, err
+}
+
+func (db BearDB) GetTitle(id string) (string, error) {
+	q := Sprintf(titleByIDQuery, id, db.limit)
+	titles, err := db.lite.QueryStrings(q)
+	if err != nil {
+		return "", err
+	}
+	if len(titles) == 0 {
+		return "", Errorf(
+			"No notes for ID '%v'", id)
+	}
+	return titles[0], err
 }
 
 //////////////////////////////////////////////

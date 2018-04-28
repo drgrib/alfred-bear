@@ -45,4 +45,7 @@ func TestBearDB(t *testing.T) {
 	recent, err := db.GetRecent()
 	comp.MustBeNil(err)
 	Println(recent)
+	title, err := db.GetTitle(recent[0].ID)
+	comp.MustBeNil(err)
+	Println(title)
 }
