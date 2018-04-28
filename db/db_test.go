@@ -36,5 +36,8 @@ func TestStringQuery(t *testing.T) {
 func TestBearDB(t *testing.T) {
 	db, err := NewBearDB()
 	comp.MustBeNil(err)
-	Println(db)
+	s := ""
+	tags, err := db.SearchTags(s)
+	comp.MustBeNil(err)
+	Println(tags)
 }

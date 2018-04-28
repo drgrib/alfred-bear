@@ -26,7 +26,7 @@ const tagQuery = `
 		AND lower(t.ZTITLE) LIKE lower('%%%v%%')
 	ORDER BY 
 		t.ZMODIFICATIONDATE DESC 
-	LIMIT %v)
+	LIMIT %v
 `
 
 //////////////////////////////////////////////
