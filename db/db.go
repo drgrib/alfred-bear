@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	. "fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -9,18 +10,46 @@ import (
 )
 
 //////////////////////////////////////////////
+/// query templates
+//////////////////////////////////////////////
+
+const tagQuery = `
+	SELECT DISTINCT
+		t.ZTITLE 
+	FROM 
+		ZSFNOTE n 
+		INNER JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES 
+		INNER JOIN ZSFNOTETAG t ON nt.Z_10TAGS = t.Z_PK 
+	WHERE 
+		n.ZARCHIVED=0 
+		AND n.ZTRASHED=0 
+		AND lower(t.ZTITLE) LIKE lower('%%%v%%')
+	ORDER BY 
+		t.ZMODIFICATIONDATE DESC 
+	LIMIT %v)
+`
+
+//////////////////////////////////////////////
 /// BearDB
 //////////////////////////////////////////////
 
 type BearDB struct {
-	lite LiteDB
+	lite  LiteDB
+	limit int
 }
 
 func NewBearDB() (BearDB, error) {
 	path := comp.Expanduser("~/Library/Containers/net.shinyfrog.bear/Data/Documents/Application Data/database.sqlite")
 	lite, err := NewLiteDB(path)
-	db := BearDB{lite}
+	limit := 25
+	db := BearDB{lite, limit}
 	return db, err
+}
+
+func (db BearDB) SearchTags(s string) ([]string, error) {
+	q := Sprintf(tagQuery, s, db.limit)
+	tags, err := db.lite.QueryStrings(q)
+	return tags, err
 }
 
 //////////////////////////////////////////////
@@ -79,7 +108,7 @@ func B2S(bs []uint8) string {
 	return string(b)
 }
 
-func (lite LiteDB) StringQuery(q string) ([]map[string]string, error) {
+func (lite LiteDB) QueryStringMaps(q string) ([]map[string]string, error) {
 	sResults := []map[string]string{}
 	iResults, err := lite.Query(q)
 	if err != nil {
@@ -91,6 +120,22 @@ func (lite LiteDB) StringQuery(q string) ([]map[string]string, error) {
 			sMap[k] = B2S(v.([]uint8))
 		}
 		sResults = append(sResults, sMap)
+	}
+	return sResults, err
+}
+
+func (lite LiteDB) QueryStrings(q string) ([]string, error) {
+	sResults := []string{}
+	iResults, err := lite.Query(q)
+	if err != nil {
+		return sResults, err
+	}
+	for _, iMap := range iResults {
+		s := ""
+		for _, v := range iMap {
+			s = B2S(v.([]uint8))
+		}
+		sResults = append(sResults, s)
 	}
 	return sResults, err
 }

@@ -23,7 +23,7 @@ func TestStringQuery(t *testing.T) {
 	path := comp.Expanduser("~/Library/Containers/net.shinyfrog.bear/Data/Documents/Application Data/database.sqlite")
 	lite, err := NewLiteDB(path)
 	comp.MustBeNil(err)
-	results, err := lite.StringQuery(q)
+	results, err := lite.QueryStringMaps(q)
 	comp.MustBeNil(err)
 	for _, m := range results {
 		for k, v := range m {
