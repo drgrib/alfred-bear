@@ -2,11 +2,8 @@ package db
 
 import (
 	"database/sql"
-	. "fmt"
 
 	_ "github.com/mattn/go-sqlite3"
-
-	"global/comp"
 )
 
 type LiteDB struct {
