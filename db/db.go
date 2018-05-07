@@ -56,6 +56,20 @@ const titleByIDQuery = `
 	LIMIT %v
 `
 
+const notesByTitleQuery = `
+	SELECT DISTINCT
+		ZUNIQUEIDENTIFIER, ZTITLE 
+	FROM 
+		ZSFNOTE 
+	WHERE 
+		ZARCHIVED=0 
+		AND ZTRASHED=0 
+		AND lower(ZTITLE) LIKE lower('%%%v%%')
+	ORDER BY 
+		ZMODIFICATIONDATE DESC 
+	LIMIT %v
+`
+
 //////////////////////////////////////////////
 /// Note
 //////////////////////////////////////////////
@@ -120,6 +134,16 @@ func (db BearDB) GetTitle(id string) (string, error) {
 			"No notes for ID '%v'", id)
 	}
 	return titles[0], err
+}
+
+func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
+	q := Sprintf(notesByTitleQuery, title, db.limit)
+	maps, err := db.lite.QueryStringMaps(q)
+	if err != nil {
+		return []Note{}, err
+	}
+	notes := toNotes(maps)
+	return notes, err
 }
 
 //////////////////////////////////////////////

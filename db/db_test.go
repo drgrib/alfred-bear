@@ -48,4 +48,12 @@ func TestBearDB(t *testing.T) {
 	title, err := db.GetTitle(recent[0].ID)
 	comp.MustBeNil(err)
 	Println(title)
+	title = "john"
+	titleNotes, err := db.SearchNotesByTitle(title)
+	comp.MustBeNil(err)
+	Println(titleNotes)
+	title = "john questions"
+	titleNotes, err = db.SearchNotesByTitle(title)
+	comp.MustBeNil(err)
+	Println(titleNotes)
 }
