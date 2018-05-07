@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	. "fmt"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -136,13 +137,32 @@ func (db BearDB) GetTitle(id string) (string, error) {
 	return titles[0], err
 }
 
-func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
+func (db BearDB) simpleSearchByTitle(title string) ([]Note, error) {
 	q := Sprintf(notesByTitleQuery, title, db.limit)
 	maps, err := db.lite.QueryStringMaps(q)
 	if err != nil {
 		return []Note{}, err
 	}
 	notes := toNotes(maps)
+	return notes, err
+}
+
+func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
+	notes, err := db.simpleSearchByTitle(title)
+	if err != nil {
+		return []Note{}, err
+	}
+	if len(notes) == 0 {
+		split := strings.Split(title, " ")
+		if len(split) > 1 {
+			// use fuzzy search, ensure spaces
+			join := strings.Join(split, "% %")
+			notes, err = db.simpleSearchByTitle(join)
+			if err != nil {
+				return []Note{}, err
+			}
+		}
+	}
 	return notes, err
 }
 
