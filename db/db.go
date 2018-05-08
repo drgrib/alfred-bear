@@ -152,16 +152,15 @@ func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
 	if err != nil {
 		return []Note{}, err
 	}
-	if len(notes) == 0 {
-		split := strings.Split(title, " ")
-		if len(split) > 1 {
-			// use fuzzy search, ensure spaces
-			join := strings.Join(split, "% %")
-			notes, err = db.simpleSearchByTitle(join)
-			if err != nil {
-				return []Note{}, err
-			}
+	split := strings.Split(title, " ")
+	if len(split) > 1 {
+		// use fuzzy search, ensure spaces
+		join := strings.Join(split, "% %")
+		moreNotes, err := db.simpleSearchByTitle(join)
+		if err != nil {
+			return notes, err
 		}
+		notes = append(notes, moreNotes...)
 	}
 	return notes, err
 }
