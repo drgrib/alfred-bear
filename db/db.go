@@ -185,23 +185,6 @@ func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
 		}
 		notes = updateNotes(notes, moreNotes, noteSet)
 	}
-	// letter gap search
-	gapList := []string{}
-	for _, word := range split {
-		gapWord := string(word[0])
-		wordLen := len(word)
-		if wordLen > 1 {
-			last := string(word[wordLen-1])
-			gapWord += "%" + last
-		}
-		gapList = append(gapList, word)
-	}
-	join := strings.Join(gapList, "% %")
-	moreNotes, err := db.simpleSearchByTitle(join)
-	if err != nil {
-		return notes, err
-	}
-	notes = updateNotes(notes, moreNotes, noteSet)
 	return notes, err
 }
 
