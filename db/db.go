@@ -147,21 +147,61 @@ func (db BearDB) simpleSearchByTitle(title string) ([]Note, error) {
 	return notes, err
 }
 
+func updateNoteMap(m map[Note]bool, items []Note) {
+	for _, n := range items {
+		m[n] = true
+	}
+}
+
+func noteMapContains(m map[Note]bool, n Note) bool {
+	_, exists := m[n]
+	return exists
+}
+
+func updateNotes(notes, moreNotes []Note, noteSet map[Note]bool) []Note {
+	for _, n := range moreNotes {
+		if !noteMapContains(noteSet, n) {
+			notes = append(notes, n)
+		}
+	}
+	updateNoteMap(noteSet, moreNotes)
+	return notes
+}
+
 func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
+	noteSet := map[Note]bool{}
 	notes, err := db.simpleSearchByTitle(title)
 	if err != nil {
 		return []Note{}, err
 	}
+	updateNoteMap(noteSet, notes)
 	split := strings.Split(title, " ")
 	if len(split) > 1 {
-		// use fuzzy search, ensure spaces
+		// word gap search
 		join := strings.Join(split, "% %")
 		moreNotes, err := db.simpleSearchByTitle(join)
 		if err != nil {
 			return notes, err
 		}
-		notes = append(notes, moreNotes...)
+		notes = updateNotes(notes, moreNotes, noteSet)
 	}
+	// letter gap search
+	gapList := []string{}
+	for _, word := range split {
+		gapWord := string(word[0])
+		wordLen := len(word)
+		if wordLen > 1 {
+			last := string(word[wordLen-1])
+			gapWord += "%" + last
+		}
+		gapList = append(gapList, word)
+	}
+	join := strings.Join(gapList, "% %")
+	moreNotes, err := db.simpleSearchByTitle(join)
+	if err != nil {
+		return notes, err
+	}
+	notes = updateNotes(notes, moreNotes, noteSet)
 	return notes, err
 }
 
