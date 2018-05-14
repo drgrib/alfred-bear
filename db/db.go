@@ -206,23 +206,28 @@ func (db BearDB) GetTitle(id string) (string, error) {
 	return titles[0], err
 }
 
-func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
-	q := Sprintf(notesByTitleQuery, title)
+func (db BearDB) gapQuery(template, fill string) (NoteList, error) {
+	q := Sprintf(template, fill)
 	notes, err := db.QueryNotes(q)
 	if err != nil {
 		return notes, err
 	}
-	split := strings.Split(title, " ")
+	split := strings.Split(fill, " ")
 	if len(split) > 1 {
 		// word gap search
 		join := strings.Join(split, "% %")
-		q := Sprintf(notesByTitleQuery, join)
+		q := Sprintf(template, join)
 		moreNotes, err := db.QueryNotes(q)
 		if err != nil {
 			return notes, err
 		}
 		notes.AppendNewFrom(moreNotes)
 	}
+	return notes, err
+}
+
+func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
+	notes, err := db.gapQuery(notesByTitleQuery, title)
 	return notes, err
 }
 
