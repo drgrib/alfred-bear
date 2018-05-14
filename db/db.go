@@ -131,6 +131,10 @@ func (notes NoteList) GetSlice() []Note {
 	return notes.slice
 }
 
+func (notes NoteList) Get(i int) Note {
+	return notes.slice[i]
+}
+
 //////////////////////////////////////////////
 /// BearDB
 //////////////////////////////////////////////
@@ -159,7 +163,7 @@ func (db BearDB) SearchTags(s string) ([]string, error) {
 	return tags, err
 }
 
-func toNotes(maps []map[string]string) []Note {
+func toNoteSlice(maps []map[string]string) []Note {
 	notes := []Note{}
 	for _, m := range maps {
 		n := Note{
@@ -171,18 +175,20 @@ func toNotes(maps []map[string]string) []Note {
 	return notes
 }
 
-func (db BearDB) QueryNotes(query string) ([]Note, error) {
-	maps, err := db.lite.QueryStringMaps(query)
+func (db BearDB) QueryNotes(query string) (NoteList, error) {
+	q := db.limitQuery(query)
+	maps, err := db.lite.QueryStringMaps(q)
+	notes := NewNoteList()
 	if err != nil {
-		return []Note{}, err
+		return notes, err
 	}
-	notes := toNotes(maps)
+	slice := toNoteSlice(maps)
+	notes.AppendNew(slice...)
 	return notes, err
 }
 
-func (db BearDB) GetRecent() ([]Note, error) {
-	q := db.limitQuery(recentQuery)
-	notes, err := db.QueryNotes(q)
+func (db BearDB) GetRecent() (NoteList, error) {
+	notes, err := db.QueryNotes(recentQuery)
 	return notes, err
 }
 
@@ -200,47 +206,22 @@ func (db BearDB) GetTitle(id string) (string, error) {
 	return titles[0], err
 }
 
-func updateNoteMap(m map[Note]bool, items []Note) {
-	for _, n := range items {
-		m[n] = true
-	}
-}
-
-func noteMapContains(m map[Note]bool, n Note) bool {
-	_, exists := m[n]
-	return exists
-}
-
-func updateNotes(notes, moreNotes []Note, noteSet map[Note]bool) []Note {
-	for _, n := range moreNotes {
-		if !noteMapContains(noteSet, n) {
-			notes = append(notes, n)
-		}
-	}
-	updateNoteMap(noteSet, moreNotes)
-	return notes
-}
-
-func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
-	noteSet := map[Note]bool{}
+func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
 	q := Sprintf(notesByTitleQuery, title)
-	q = db.limitQuery(q)
 	notes, err := db.QueryNotes(q)
 	if err != nil {
-		return []Note{}, err
+		return notes, err
 	}
-	updateNoteMap(noteSet, notes)
 	split := strings.Split(title, " ")
 	if len(split) > 1 {
 		// word gap search
 		join := strings.Join(split, "% %")
 		q := Sprintf(notesByTitleQuery, join)
-		q = db.limitQuery(q)
 		moreNotes, err := db.QueryNotes(q)
 		if err != nil {
 			return notes, err
 		}
-		notes = updateNotes(notes, moreNotes, noteSet)
+		notes.AppendNewFrom(moreNotes)
 	}
 	return notes, err
 }
