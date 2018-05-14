@@ -124,7 +124,7 @@ func (notes *NoteList) AppendNewFrom(other NoteList) {
 }
 
 func (notes NoteList) String() string {
-	return Sprintf("%s", notes.slice)
+	return Sprintf("NoteList%s", notes.slice)
 }
 
 func (notes NoteList) GetSlice() []Note {
