@@ -78,7 +78,6 @@ const notesByTextQuery = `
 		AND lower(ZTEXT) LIKE lower('%%%v%%')
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
 //////////////////////////////////////////////
