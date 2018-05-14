@@ -80,6 +80,24 @@ const notesByTextTemplate = `
 		ZMODIFICATIONDATE DESC 
 `
 
+const notesByTagsTemplate = `
+	SELECT DISTINCT
+		note.ZUNIQUEIDENTIFIER, note.ZTITLE
+	FROM
+		ZSFNOTE note
+		INNER JOIN Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+		INNER JOIN ZSFNOTETAG tag ON nTag.Z_10TAGS = tag.Z_PK
+	WHERE
+		note.ZARCHIVED=0
+		AND note.ZTRASHED=0
+		AND (%v)
+		AND %v
+	GROUP BY note.ZUNIQUEIDENTIFIER
+	HAVING COUNT(*) >= %v
+	ORDER BY
+		note.ZMODIFICATIONDATE DESC
+`
+
 //////////////////////////////////////////////
 /// Note
 //////////////////////////////////////////////
@@ -251,6 +269,18 @@ func (db BearDB) SearchNotes(text string) (NoteList, error) {
 	}
 	titleNotes.AppendNewFrom(textNotes)
 	return titleNotes, err
+}
+
+func (db BearDB) buildTagTemplate(tags []string) string {
+	whereTemplate := "lower(tag.ZTITLE) = lower('%v')"
+	whereSlice := []string{}
+	for _, t := range tags {
+
+	}
+}
+
+func (db BearDB) SearchNotesByTitleWithTags(title string, tags []string) (NoteList, error) {
+
 }
 
 //////////////////////////////////////////////
