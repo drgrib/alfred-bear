@@ -71,6 +71,20 @@ const notesByTitleQuery = `
 	LIMIT %v
 `
 
+const notesByTextQuery = `
+	SELECT DISTINCT
+		ZUNIQUEIDENTIFIER, ZTITLE 
+	FROM 
+		ZSFNOTE 
+	WHERE 
+		ZARCHIVED=0 
+		AND ZTRASHED=0 
+		AND lower(ZTEXT) LIKE lower('%%%v%%')
+	ORDER BY 
+		ZMODIFICATIONDATE DESC 
+	LIMIT %v
+`
+
 //////////////////////////////////////////////
 /// Note
 //////////////////////////////////////////////
@@ -137,9 +151,8 @@ func (db BearDB) GetTitle(id string) (string, error) {
 	return titles[0], err
 }
 
-func (db BearDB) simpleSearchByTitle(title string) ([]Note, error) {
-	q := Sprintf(notesByTitleQuery, title, db.limit)
-	maps, err := db.lite.QueryStringMaps(q)
+func (db BearDB) QueryNotes(query string) ([]Note, error) {
+	maps, err := db.lite.QueryStringMaps(query)
 	if err != nil {
 		return []Note{}, err
 	}
@@ -170,7 +183,8 @@ func updateNotes(notes, moreNotes []Note, noteSet map[Note]bool) []Note {
 
 func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
 	noteSet := map[Note]bool{}
-	notes, err := db.simpleSearchByTitle(title)
+	q := Sprintf(notesByTitleQuery, title, db.limit)
+	notes, err := db.QueryNotes(q)
 	if err != nil {
 		return []Note{}, err
 	}
@@ -179,7 +193,8 @@ func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
 	if len(split) > 1 {
 		// word gap search
 		join := strings.Join(split, "% %")
-		moreNotes, err := db.simpleSearchByTitle(join)
+		q := Sprintf(notesByTitleQuery, join, db.limit)
+		moreNotes, err := db.QueryNotes(q)
 		if err != nil {
 			return notes, err
 		}
