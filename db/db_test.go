@@ -43,6 +43,7 @@ func TestNoteList(t *testing.T) {
 	notes2.AppendNew(Note{"XX3", "Note 3"})
 	notes.AppendNewFrom(notes2)
 	Println(notes)
+	Println(notes.GetSlice())
 }
 
 func TestBearDB(t *testing.T) {
