@@ -33,6 +33,18 @@ func TestStringQuery(t *testing.T) {
 	}
 }
 
+func TestNoteList(t *testing.T) {
+	notes := NewNoteList()
+	notes.AppendNew(Note{"XXX", "Note 1"})
+	notes.AppendNew(Note{"XXX", "Note 1"})
+	notes.AppendNew(Note{"XX2", "Note 2"})
+	notes2 := NewNoteList()
+	notes2.AppendNew(Note{"XXX", "Note 1"})
+	notes2.AppendNew(Note{"XX3", "Note 3"})
+	notes.AppendNewFrom(notes2)
+	Println(notes)
+}
+
 func TestBearDB(t *testing.T) {
 	db, err := NewBearDB()
 	comp.MustBeNil(err)

@@ -89,6 +89,45 @@ type Note struct {
 }
 
 //////////////////////////////////////////////
+/// NoteList
+//////////////////////////////////////////////
+
+type NoteList struct {
+	set  map[Note]bool
+	list []Note
+}
+
+func NewNoteList() NoteList {
+	notes := NoteList{
+		set:  map[Note]bool{},
+		list: []Note{},
+	}
+	return notes
+}
+
+func (notes NoteList) Contains(n Note) bool {
+	_, exists := notes.set[n]
+	return exists
+}
+
+func (notes *NoteList) AppendNew(other ...Note) {
+	for _, n := range other {
+		if !notes.Contains(n) {
+			notes.list = append(notes.list, n)
+			notes.set[n] = true
+		}
+	}
+}
+
+func (notes *NoteList) AppendNewFrom(other NoteList) {
+	notes.AppendNew(other.list...)
+}
+
+func (notes NoteList) String() string {
+	return Sprintf("%s", notes.list)
+}
+
+//////////////////////////////////////////////
 /// BearDB
 //////////////////////////////////////////////
 
