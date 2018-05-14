@@ -27,7 +27,6 @@ const tagQuery = `
 		AND lower(t.ZTITLE) LIKE lower('%%%v%%')
 	ORDER BY 
 		t.ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
 const recentQuery = `
@@ -40,7 +39,6 @@ const recentQuery = `
 		AND ZTRASHED=0 
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
 const titleByIDQuery = `
@@ -54,7 +52,6 @@ const titleByIDQuery = `
 		AND ZUNIQUEIDENTIFIER='%v' 
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
 const notesByTitleQuery = `
@@ -68,7 +65,6 @@ const notesByTitleQuery = `
 		AND lower(ZTITLE) LIKE lower('%%%v%%')
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
 const notesByTextQuery = `
@@ -110,8 +106,13 @@ func NewBearDB() (BearDB, error) {
 	return db, err
 }
 
+func (db BearDB) limitQuery(q string) string {
+	return Sprintf("%s LIMIT %v", q, db.limit)
+}
+
 func (db BearDB) SearchTags(s string) ([]string, error) {
-	q := Sprintf(tagQuery, s, db.limit)
+	q := Sprintf(tagQuery, s)
+	q = db.limitQuery(q)
 	tags, err := db.lite.QueryStrings(q)
 	return tags, err
 }
@@ -138,12 +139,14 @@ func (db BearDB) QueryNotes(query string) ([]Note, error) {
 }
 
 func (db BearDB) GetRecent() ([]Note, error) {
-	q := Sprintf(recentQuery, db.limit)
-	return db.QueryNotes(q)
+	q := db.limitQuery(recentQuery)
+	notes, err := db.QueryNotes(q)
+	return notes, err
 }
 
 func (db BearDB) GetTitle(id string) (string, error) {
-	q := Sprintf(titleByIDQuery, id, db.limit)
+	q := Sprintf(titleByIDQuery, id)
+	q = db.limitQuery(q)
 	titles, err := db.lite.QueryStrings(q)
 	if err != nil {
 		return "", err
@@ -178,7 +181,8 @@ func updateNotes(notes, moreNotes []Note, noteSet map[Note]bool) []Note {
 
 func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
 	noteSet := map[Note]bool{}
-	q := Sprintf(notesByTitleQuery, title, db.limit)
+	q := Sprintf(notesByTitleQuery, title)
+	q = db.limitQuery(q)
 	notes, err := db.QueryNotes(q)
 	if err != nil {
 		return []Note{}, err
@@ -188,7 +192,8 @@ func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
 	if len(split) > 1 {
 		// word gap search
 		join := strings.Join(split, "% %")
-		q := Sprintf(notesByTitleQuery, join, db.limit)
+		q := Sprintf(notesByTitleQuery, join)
+		q = db.limitQuery(q)
 		moreNotes, err := db.QueryNotes(q)
 		if err != nil {
 			return notes, err
