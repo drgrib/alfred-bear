@@ -135,6 +135,10 @@ func (notes NoteList) Get(i int) Note {
 	return notes.slice[i]
 }
 
+func (notes NoteList) Len() int {
+	return len(notes.slice)
+}
+
 //////////////////////////////////////////////
 /// BearDB
 //////////////////////////////////////////////
@@ -229,6 +233,24 @@ func (db BearDB) gapQuery(template, fill string) (NoteList, error) {
 func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
 	notes, err := db.gapQuery(notesByTitleQuery, title)
 	return notes, err
+}
+
+func (db BearDB) SearchNotesByText(text string) (NoteList, error) {
+	notes, err := db.gapQuery(notesByTextQuery, text)
+	return notes, err
+}
+
+func (db BearDB) SearchNotes(text string) (NoteList, error) {
+	titleNotes, err := db.SearchNotesByTitle(text)
+	if err != nil {
+		return titleNotes, err
+	}
+	textNotes, err := db.SearchNotesByText(text)
+	if err != nil {
+		return titleNotes, err
+	}
+	titleNotes.AppendNewFrom(textNotes)
+	return titleNotes, err
 }
 
 //////////////////////////////////////////////

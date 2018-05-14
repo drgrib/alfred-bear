@@ -69,4 +69,13 @@ func TestBearDB(t *testing.T) {
 	titleNotes, err = db.SearchNotesByTitle(title)
 	comp.MustBeNil(err)
 	Println(titleNotes)
+	Println(titleNotes.Len())
+	textNotes, err := db.SearchNotesByText(title)
+	comp.MustBeNil(err)
+	Println(textNotes)
+	Println(textNotes.Len())
+	generalNotes, err := db.SearchNotes(title)
+	comp.MustBeNil(err)
+	Println(generalNotes)
+	Println(generalNotes.Len())
 }
