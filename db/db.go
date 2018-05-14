@@ -128,14 +128,18 @@ func toNotes(maps []map[string]string) []Note {
 	return notes
 }
 
-func (db BearDB) GetRecent() ([]Note, error) {
-	q := Sprintf(recentQuery, db.limit)
-	maps, err := db.lite.QueryStringMaps(q)
+func (db BearDB) QueryNotes(query string) ([]Note, error) {
+	maps, err := db.lite.QueryStringMaps(query)
 	if err != nil {
 		return []Note{}, err
 	}
 	notes := toNotes(maps)
 	return notes, err
+}
+
+func (db BearDB) GetRecent() ([]Note, error) {
+	q := Sprintf(recentQuery, db.limit)
+	return db.QueryNotes(q)
 }
 
 func (db BearDB) GetTitle(id string) (string, error) {
@@ -149,15 +153,6 @@ func (db BearDB) GetTitle(id string) (string, error) {
 			"No notes for ID '%v'", id)
 	}
 	return titles[0], err
-}
-
-func (db BearDB) QueryNotes(query string) ([]Note, error) {
-	maps, err := db.lite.QueryStringMaps(query)
-	if err != nil {
-		return []Note{}, err
-	}
-	notes := toNotes(maps)
-	return notes, err
 }
 
 func updateNoteMap(m map[Note]bool, items []Note) {
