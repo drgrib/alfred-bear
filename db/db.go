@@ -14,7 +14,7 @@ import (
 /// query templates
 //////////////////////////////////////////////
 
-const tagQuery = `
+const tagTemplate = `
 	SELECT DISTINCT
 		t.ZTITLE 
 	FROM 
@@ -41,7 +41,7 @@ const recentQuery = `
 		ZMODIFICATIONDATE DESC 
 `
 
-const titleByIDQuery = `
+const titleByIDTemplate = `
 	SELECT DISTINCT
 		ZTITLE 
 	FROM 
@@ -54,7 +54,7 @@ const titleByIDQuery = `
 		ZMODIFICATIONDATE DESC 
 `
 
-const notesByTitleQuery = `
+const notesByTitleTemplate = `
 	SELECT DISTINCT
 		ZUNIQUEIDENTIFIER, ZTITLE 
 	FROM 
@@ -67,7 +67,7 @@ const notesByTitleQuery = `
 		ZMODIFICATIONDATE DESC 
 `
 
-const notesByTextQuery = `
+const notesByTextTemplate = `
 	SELECT DISTINCT
 		ZUNIQUEIDENTIFIER, ZTITLE 
 	FROM 
@@ -161,7 +161,7 @@ func (db BearDB) limitQuery(q string) string {
 }
 
 func (db BearDB) SearchTags(s string) ([]string, error) {
-	q := Sprintf(tagQuery, s)
+	q := Sprintf(tagTemplate, s)
 	q = db.limitQuery(q)
 	tags, err := db.lite.QueryStrings(q)
 	return tags, err
@@ -197,7 +197,7 @@ func (db BearDB) GetRecent() (NoteList, error) {
 }
 
 func (db BearDB) GetTitle(id string) (string, error) {
-	q := Sprintf(titleByIDQuery, id)
+	q := Sprintf(titleByIDTemplate, id)
 	q = db.limitQuery(q)
 	titles, err := db.lite.QueryStrings(q)
 	if err != nil {
@@ -231,12 +231,12 @@ func (db BearDB) gapQuery(template, fill string) (NoteList, error) {
 }
 
 func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
-	notes, err := db.gapQuery(notesByTitleQuery, title)
+	notes, err := db.gapQuery(notesByTitleTemplate, title)
 	return notes, err
 }
 
 func (db BearDB) SearchNotesByText(text string) (NoteList, error) {
-	notes, err := db.gapQuery(notesByTextQuery, text)
+	notes, err := db.gapQuery(notesByTextTemplate, text)
 	return notes, err
 }
 

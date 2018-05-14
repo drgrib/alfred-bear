@@ -79,3 +79,16 @@ func TestBearDB(t *testing.T) {
 	Println(generalNotes)
 	Println(generalNotes.Len())
 }
+
+func TestPartialFill(t *testing.T) {
+	template := "First %v then %v"
+	Println(template)
+	partial := Sprintf(template, "a", "%v")
+	Println(partial)
+	full := Sprintf(partial, "b")
+	Println(full)
+	partial2 := Sprintf(template, "%v", "d")
+	Println(partial2)
+	full2 := Sprintf(partial2, "c")
+	Println(full2)
+}
