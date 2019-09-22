@@ -35,7 +35,7 @@ ORDER BY
 LIMIT 25
 `
 
-	NOTES_BY_TITLE = `
+	NOTES_BY_QUERY = `
 SELECT DISTINCT
     note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
 FROM
@@ -45,27 +45,12 @@ FROM
 WHERE
     note.ZARCHIVED=0
     AND note.ZTRASHED=0
-    AND lower(note.ZTITLE) LIKE lower('%%%s%%')
+    AND (
+		lower(note.ZTITLE) LIKE lower('%%%s%%') OR
+		lower(note.ZTEXT) LIKE lower('%%%s%%')
+	)
 GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY
-    note.ZMODIFICATIONDATE DESC
-LIMIT 25
-`
-
-	NOTES_BY_TEXT = `
-SELECT DISTINCT
-    note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
-FROM
-    ZSFNOTE note
-    INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-    INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
-WHERE
-    note.ZARCHIVED=0
-    AND note.ZTRASHED=0
-    AND lower(note.ZTEXT) LIKE lower('%%%s%%')
-GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY
-    note.ZMODIFICATIONDATE DESC
+ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
 LIMIT 25
 `
 
@@ -229,18 +214,11 @@ func main() {
 	default:
 		wordStr := strings.Join(words, " ")
 
-		rows, err := db.Query(fmt.Sprintf(NOTES_BY_TITLE, wordStr))
+		rows, err := db.Query(fmt.Sprintf(NOTES_BY_QUERY, wordStr, wordStr, wordStr))
 		if err != nil {
 			panic(err)
 		}
 		addNoteRowsToAlfred(rows)
-
-		textRows, err := db.Query(fmt.Sprintf(NOTES_BY_TEXT, wordStr))
-		if err != nil {
-			panic(err)
-		}
-		newRows := getUniqueRows(rows, textRows)
-		addNoteRowsToAlfred(newRows)
 	}
 
 	alfred.Run()
