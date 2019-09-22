@@ -13,13 +13,13 @@ import (
 )
 
 const (
+	DbPath = "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite"
+
 	TitleKey  = "ZTITLE"
 	TagsKey   = "group_concat(tag.ZTITLE)"
 	NoteIDKey = "ZUNIQUEIDENTIFIER"
-	DbPath    = "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite"
-)
 
-var RECENT_NOTES = `
+	RECENT_NOTES = `
 SELECT DISTINCT
     note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
 FROM
@@ -34,6 +34,41 @@ ORDER BY
     note.ZMODIFICATIONDATE DESC
 LIMIT 25
 `
+
+	NOTES_BY_TITLE = `
+SELECT DISTINCT
+    note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+    ZSFNOTE note
+    INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+    INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE
+    note.ZARCHIVED=0
+    AND note.ZTRASHED=0
+    AND lower(note.ZTITLE) LIKE lower('%%%s%%')
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY
+    note.ZMODIFICATIONDATE DESC
+LIMIT 25
+`
+
+	NOTES_BY_TEXT = `
+SELECT DISTINCT
+    note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+    ZSFNOTE note
+    INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+    INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE
+    note.ZARCHIVED=0
+    AND note.ZTRASHED=0
+    AND lower(note.ZTEXT) LIKE lower('%%%s%%')
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY
+    note.ZMODIFICATIONDATE DESC
+LIMIT 25
+`
+)
 
 type LiteDB struct {
 	db *sql.DB
@@ -111,6 +146,22 @@ func addDatabaseRowsToAlfred(rows []map[string]string) {
 	}
 }
 
+func getUniqueRows(currentRows, newRows []map[string]string) []map[string]string {
+	currentRowIDs := map[string]bool{}
+	for _, row := range currentRows {
+		currentRowIDs[row[NoteIDKey]] = true
+	}
+
+	uniqueRows := []map[string]string{}
+	for _, row := range newRows {
+		if _, ok := currentRowIDs[row[NoteIDKey]]; !ok {
+			uniqueRows = append(uniqueRows, row)
+		}
+	}
+
+	return uniqueRows
+}
+
 func main() {
 	query := os.Args[1]
 
@@ -143,12 +194,20 @@ func main() {
 
 		addDatabaseRowsToAlfred(rows)
 	} else {
-		alfred.Add(alfred.Item{
-			Title:    query,
-			Subtitle: fmt.Sprintf("%v %v %v %v %#v", words, len(words), tags, len(tags), lastElement),
-			Arg:      "arg",
-			UID:      "uid",
-		})
+		wordStr := strings.Join(words, " ")
+
+		rows, err := db.Query(fmt.Sprintf(NOTES_BY_TITLE, wordStr))
+		if err != nil {
+			panic(err)
+		}
+		addDatabaseRowsToAlfred(rows)
+
+		textRows, err := db.Query(fmt.Sprintf(NOTES_BY_TEXT, wordStr))
+		if err != nil {
+			panic(err)
+		}
+		newRows := getUniqueRows(rows, textRows)
+		addDatabaseRowsToAlfred(newRows)
 	}
 
 	alfred.Run()
