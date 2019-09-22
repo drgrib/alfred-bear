@@ -1,0 +1,155 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/drgrib/alfred"
+	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/drgrib/alfred-bear/comp"
+)
+
+const (
+	TitleKey  = "ZTITLE"
+	TagsKey   = "group_concat(tag.ZTITLE)"
+	NoteIDKey = "ZUNIQUEIDENTIFIER"
+	DbPath    = "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite"
+)
+
+var RECENT_NOTES = `
+SELECT DISTINCT
+    note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+    ZSFNOTE note
+    INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+    INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE
+    note.ZARCHIVED=0
+    AND note.ZTRASHED=0
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY
+    note.ZMODIFICATIONDATE DESC
+LIMIT 25
+`
+
+type LiteDB struct {
+	db *sql.DB
+}
+
+func NewLiteDB(path string) (LiteDB, error) {
+	db, err := sql.Open("sqlite3", path)
+	lite := LiteDB{db}
+	return lite, err
+}
+
+func (lite LiteDB) Query(q string) ([]map[string]string, error) {
+	results := []map[string]string{}
+	rows, err := lite.db.Query(q)
+	if err != nil {
+		return results, err
+	}
+	defer rows.Close()
+
+	cols, err := rows.Columns()
+	if err != nil {
+		return results, err
+	}
+
+	for rows.Next() {
+		m := map[string]string{}
+		columns := make([]interface{}, len(cols))
+		columnPointers := make([]interface{}, len(cols))
+		for i := range columns {
+			columnPointers[i] = &columns[i]
+		}
+		if err := rows.Scan(columnPointers...); err != nil {
+			return results, err
+		}
+		for i, colName := range cols {
+			val := columnPointers[i].(*interface{})
+			uints, ok := (*val).([]uint8)
+			if ok {
+				m[colName] = string(uints)
+			} else {
+				return results, fmt.Errorf("Problem converting record to values to strings for %#v", *val)
+			}
+		}
+		results = append(results, m)
+	}
+	return results, err
+}
+
+func getUniqueTagString(tagString string) string {
+	tags := strings.Split(tagString, ",")
+	uniqueTags := []string{}
+	for _, t := range tags {
+		isPrefix := false
+		for _, other := range tags {
+			if t != other && strings.HasPrefix(other, t) {
+				isPrefix = true
+				break
+			}
+		}
+		if !isPrefix {
+			uniqueTags = append(uniqueTags, t)
+		}
+	}
+	return "#" + strings.Join(uniqueTags, "# ")
+}
+
+func addDatabaseRowsToAlfred(rows []map[string]string) {
+	for _, row := range rows {
+		alfred.Add(alfred.Item{
+			Title:    row[TitleKey],
+			Subtitle: getUniqueTagString(row[TagsKey]),
+			Arg:      row[NoteIDKey],
+			Valid:    alfred.Bool(true),
+		})
+	}
+}
+
+func main() {
+	query := os.Args[1]
+
+	path := comp.Expanduser(DbPath)
+	db, err := NewLiteDB(path)
+	if err != nil {
+		panic(err)
+	}
+
+	elements := strings.Split(query, " ")
+	tags := []string{}
+	words := []string{}
+	lastElement := ""
+	for _, e := range elements {
+		switch {
+		case e == "":
+		case strings.HasPrefix(e, "#"):
+			tags = append(tags, e)
+		default:
+			words = append(words, e)
+		}
+		lastElement = e
+	}
+
+	if len(words) == 0 && len(tags) == 0 && lastElement == "" {
+		rows, err := db.Query(RECENT_NOTES)
+		if err != nil {
+			panic(err)
+		}
+
+		addDatabaseRowsToAlfred(rows)
+	} else {
+		alfred.Add(alfred.Item{
+			Title:    query,
+			Subtitle: fmt.Sprintf("%v %v %v %v %#v", words, len(words), tags, len(tags), lastElement),
+			Arg:      "arg",
+			UID:      "uid",
+		})
+	}
+
+	alfred.Run()
+}
