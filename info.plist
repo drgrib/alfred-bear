@@ -247,7 +247,7 @@
 				<key>runningsubtext</key>
 				<string>Searching...</string>
 				<key>script</key>
-				<string>/usr/bin/python search.py "{query}"</string>
+				<string>alfred-bear/alfred-bear "{query}"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
