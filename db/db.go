@@ -14,7 +14,7 @@ import (
 /// query templates
 //////////////////////////////////////////////
 
-const tagQuery = `
+const tagTemplate = `
 	SELECT DISTINCT
 		t.ZTITLE 
 	FROM 
@@ -27,7 +27,6 @@ const tagQuery = `
 		AND lower(t.ZTITLE) LIKE lower('%%%v%%')
 	ORDER BY 
 		t.ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
 const recentQuery = `
@@ -40,10 +39,9 @@ const recentQuery = `
 		AND ZTRASHED=0 
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
-const titleByIDQuery = `
+const titleByIDTemplate = `
 	SELECT DISTINCT
 		ZTITLE 
 	FROM 
@@ -54,10 +52,9 @@ const titleByIDQuery = `
 		AND ZUNIQUEIDENTIFIER='%v' 
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
 `
 
-const notesByTitleQuery = `
+const notesByTitleTemplate = `
 	SELECT DISTINCT
 		ZUNIQUEIDENTIFIER, ZTITLE 
 	FROM 
@@ -68,7 +65,37 @@ const notesByTitleQuery = `
 		AND lower(ZTITLE) LIKE lower('%%%v%%')
 	ORDER BY 
 		ZMODIFICATIONDATE DESC 
-	LIMIT %v
+`
+
+const notesByTextTemplate = `
+	SELECT DISTINCT
+		ZUNIQUEIDENTIFIER, ZTITLE 
+	FROM 
+		ZSFNOTE 
+	WHERE 
+		ZARCHIVED=0 
+		AND ZTRASHED=0 
+		AND lower(ZTEXT) LIKE lower('%%%v%%')
+	ORDER BY 
+		ZMODIFICATIONDATE DESC 
+`
+
+const notesByTagsTemplate = `
+	SELECT DISTINCT
+		note.ZUNIQUEIDENTIFIER, note.ZTITLE
+	FROM
+		ZSFNOTE note
+		INNER JOIN Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+		INNER JOIN ZSFNOTETAG tag ON nTag.Z_10TAGS = tag.Z_PK
+	WHERE
+		note.ZARCHIVED=0
+		AND note.ZTRASHED=0
+		AND (%v)
+		AND %v
+	GROUP BY note.ZUNIQUEIDENTIFIER
+	HAVING COUNT(*) >= %v
+	ORDER BY
+		note.ZMODIFICATIONDATE DESC
 `
 
 //////////////////////////////////////////////
@@ -77,6 +104,57 @@ const notesByTitleQuery = `
 
 type Note struct {
 	ID, Title string
+}
+
+//////////////////////////////////////////////
+/// NoteList
+//////////////////////////////////////////////
+
+type NoteList struct {
+	set   map[Note]bool
+	slice []Note
+}
+
+func NewNoteList() NoteList {
+	notes := NoteList{
+		set:   map[Note]bool{},
+		slice: []Note{},
+	}
+	return notes
+}
+
+func (notes NoteList) Contains(n Note) bool {
+	_, exists := notes.set[n]
+	return exists
+}
+
+func (notes *NoteList) AppendNew(other ...Note) {
+	for _, n := range other {
+		if !notes.Contains(n) {
+			notes.slice = append(notes.slice, n)
+			notes.set[n] = true
+		}
+	}
+}
+
+func (notes *NoteList) AppendNewFrom(other NoteList) {
+	notes.AppendNew(other.slice...)
+}
+
+func (notes NoteList) String() string {
+	return Sprintf("NoteList%s", notes.slice)
+}
+
+func (notes NoteList) GetSlice() []Note {
+	return notes.slice
+}
+
+func (notes NoteList) Get(i int) Note {
+	return notes.slice[i]
+}
+
+func (notes NoteList) Len() int {
+	return len(notes.slice)
 }
 
 //////////////////////////////////////////////
@@ -96,13 +174,18 @@ func NewBearDB() (BearDB, error) {
 	return db, err
 }
 
+func (db BearDB) limitQuery(q string) string {
+	return Sprintf("%s LIMIT %v", q, db.limit)
+}
+
 func (db BearDB) SearchTags(s string) ([]string, error) {
-	q := Sprintf(tagQuery, s, db.limit)
+	q := Sprintf(tagTemplate, s)
+	q = db.limitQuery(q)
 	tags, err := db.lite.QueryStrings(q)
 	return tags, err
 }
 
-func toNotes(maps []map[string]string) []Note {
+func toNoteSlice(maps []map[string]string) []Note {
 	notes := []Note{}
 	for _, m := range maps {
 		n := Note{
@@ -114,18 +197,26 @@ func toNotes(maps []map[string]string) []Note {
 	return notes
 }
 
-func (db BearDB) GetRecent() ([]Note, error) {
-	q := Sprintf(recentQuery, db.limit)
+func (db BearDB) QueryNotes(query string) (NoteList, error) {
+	q := db.limitQuery(query)
 	maps, err := db.lite.QueryStringMaps(q)
+	notes := NewNoteList()
 	if err != nil {
-		return []Note{}, err
+		return notes, err
 	}
-	notes := toNotes(maps)
+	slice := toNoteSlice(maps)
+	notes.AppendNew(slice...)
+	return notes, err
+}
+
+func (db BearDB) GetRecent() (NoteList, error) {
+	notes, err := db.QueryNotes(recentQuery)
 	return notes, err
 }
 
 func (db BearDB) GetTitle(id string) (string, error) {
-	q := Sprintf(titleByIDQuery, id, db.limit)
+	q := Sprintf(titleByIDTemplate, id)
+	q = db.limitQuery(q)
 	titles, err := db.lite.QueryStrings(q)
 	if err != nil {
 		return "", err
@@ -137,33 +228,59 @@ func (db BearDB) GetTitle(id string) (string, error) {
 	return titles[0], err
 }
 
-func (db BearDB) simpleSearchByTitle(title string) ([]Note, error) {
-	q := Sprintf(notesByTitleQuery, title, db.limit)
-	maps, err := db.lite.QueryStringMaps(q)
+func (db BearDB) gapQuery(template, fill string) (NoteList, error) {
+	q := Sprintf(template, fill)
+	notes, err := db.QueryNotes(q)
 	if err != nil {
-		return []Note{}, err
+		return notes, err
 	}
-	notes := toNotes(maps)
+	split := strings.Split(fill, " ")
+	if len(split) > 1 {
+		// word gap search
+		join := strings.Join(split, "% %")
+		q := Sprintf(template, join)
+		moreNotes, err := db.QueryNotes(q)
+		if err != nil {
+			return notes, err
+		}
+		notes.AppendNewFrom(moreNotes)
+	}
 	return notes, err
 }
 
-func (db BearDB) SearchNotesByTitle(title string) ([]Note, error) {
-	notes, err := db.simpleSearchByTitle(title)
-	if err != nil {
-		return []Note{}, err
-	}
-	if len(notes) == 0 {
-		split := strings.Split(title, " ")
-		if len(split) > 1 {
-			// use fuzzy search, ensure spaces
-			join := strings.Join(split, "% %")
-			notes, err = db.simpleSearchByTitle(join)
-			if err != nil {
-				return []Note{}, err
-			}
-		}
-	}
+func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
+	notes, err := db.gapQuery(notesByTitleTemplate, title)
 	return notes, err
+}
+
+func (db BearDB) SearchNotesByText(text string) (NoteList, error) {
+	notes, err := db.gapQuery(notesByTextTemplate, text)
+	return notes, err
+}
+
+func (db BearDB) SearchNotes(text string) (NoteList, error) {
+	titleNotes, err := db.SearchNotesByTitle(text)
+	if err != nil {
+		return titleNotes, err
+	}
+	textNotes, err := db.SearchNotesByText(text)
+	if err != nil {
+		return titleNotes, err
+	}
+	titleNotes.AppendNewFrom(textNotes)
+	return titleNotes, err
+}
+
+func (db BearDB) buildTagTemplate(tags []string) string {
+	whereTemplate := "lower(tag.ZTITLE) = lower('%v')"
+	whereSlice := []string{}
+	for _, t := range tags {
+
+	}
+}
+
+func (db BearDB) SearchNotesByTitleWithTags(title string, tags []string) (NoteList, error) {
+
 }
 
 //////////////////////////////////////////////

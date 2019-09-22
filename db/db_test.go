@@ -33,6 +33,19 @@ func TestStringQuery(t *testing.T) {
 	}
 }
 
+func TestNoteList(t *testing.T) {
+	notes := NewNoteList()
+	notes.AppendNew(Note{"XXX", "Note 1"})
+	notes.AppendNew(Note{"XXX", "Note 1"})
+	notes.AppendNew(Note{"XX2", "Note 2"})
+	notes2 := NewNoteList()
+	notes2.AppendNew(Note{"XXX", "Note 1"})
+	notes2.AppendNew(Note{"XX3", "Note 3"})
+	notes.AppendNewFrom(notes2)
+	Println(notes)
+	Println(notes.GetSlice())
+}
+
 func TestBearDB(t *testing.T) {
 	db, err := NewBearDB()
 	comp.MustBeNil(err)
@@ -45,7 +58,7 @@ func TestBearDB(t *testing.T) {
 	recent, err := db.GetRecent()
 	comp.MustBeNil(err)
 	Println(recent)
-	title, err := db.GetTitle(recent[0].ID)
+	title, err := db.GetTitle(recent.Get(0).ID)
 	comp.MustBeNil(err)
 	Println(title)
 	title = "john"
@@ -56,4 +69,26 @@ func TestBearDB(t *testing.T) {
 	titleNotes, err = db.SearchNotesByTitle(title)
 	comp.MustBeNil(err)
 	Println(titleNotes)
+	Println(titleNotes.Len())
+	textNotes, err := db.SearchNotesByText(title)
+	comp.MustBeNil(err)
+	Println(textNotes)
+	Println(textNotes.Len())
+	generalNotes, err := db.SearchNotes(title)
+	comp.MustBeNil(err)
+	Println(generalNotes)
+	Println(generalNotes.Len())
+}
+
+func TestPartialFill(t *testing.T) {
+	template := "First %v then %v"
+	Println(template)
+	partial := Sprintf(template, "a", "%v")
+	Println(partial)
+	full := Sprintf(partial, "b")
+	Println(full)
+	partial2 := Sprintf(template, "%v", "d")
+	Println(partial2)
+	full2 := Sprintf(partial2, "c")
+	Println(full2)
 }
