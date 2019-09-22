@@ -186,14 +186,15 @@ func main() {
 		lastElement = e
 	}
 
-	if len(words) == 0 && len(tags) == 0 && lastElement == "" {
+	switch {
+	case len(words) == 0 && len(tags) == 0 && lastElement == "":
 		rows, err := db.Query(RECENT_NOTES)
 		if err != nil {
 			panic(err)
 		}
 
 		addDatabaseRowsToAlfred(rows)
-	} else {
+	default:
 		wordStr := strings.Join(words, " ")
 
 		rows, err := db.Query(fmt.Sprintf(NOTES_BY_TITLE, wordStr))
