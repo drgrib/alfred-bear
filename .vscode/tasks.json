@@ -7,9 +7,9 @@
             "label": "go build",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}/alfred-bear"
+                "cwd": "${workspaceFolder}/cmd/search"
             },
-            "command": "rm -f alfred-bear; go build",
+            "command": "rm -f search; go build",
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
