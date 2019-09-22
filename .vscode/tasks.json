@@ -7,7 +7,7 @@
             "label": "go build",
             "type": "shell",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}/alfred-bear"
             },
             "command": "rm -f alfred-bear; go build",
             "presentation": {
