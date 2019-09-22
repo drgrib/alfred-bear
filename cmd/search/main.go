@@ -68,6 +68,22 @@ ORDER BY
     note.ZMODIFICATIONDATE DESC
 LIMIT 25
 `
+
+	TAGS_BY_TITLE = `
+SELECT DISTINCT
+    t.ZTITLE
+FROM
+    ZSFNOTE n
+    INNER JOIN Z_7TAGS nt ON n.Z_PK = nt.Z_7NOTES
+    INNER JOIN ZSFNOTETAG t ON nt.Z_14TAGS = t.Z_PK
+WHERE
+    n.ZARCHIVED=0
+    AND n.ZTRASHED=0
+    AND lower(t.ZTITLE) LIKE lower('%%%s%%')
+ORDER BY
+    t.ZMODIFICATIONDATE DESC
+LIMIT 25
+`
 )
 
 type LiteDB struct {
@@ -135,7 +151,7 @@ func getUniqueTagString(tagString string) string {
 	return "#" + strings.Join(uniqueTags, "# ")
 }
 
-func addDatabaseRowsToAlfred(rows []map[string]string) {
+func addNoteRowsToAlfred(rows []map[string]string) {
 	for _, row := range rows {
 		alfred.Add(alfred.Item{
 			Title:    row[TitleKey],
@@ -192,8 +208,24 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		addNoteRowsToAlfred(rows)
 
-		addDatabaseRowsToAlfred(rows)
+	case strings.HasPrefix(lastElement, "#"):
+		rows, err := db.Query(fmt.Sprintf(TAGS_BY_TITLE, lastElement[1:]))
+		if err != nil {
+			panic(err)
+		}
+
+		for _, row := range rows {
+			tag := "#" + row[TitleKey]
+			autocomplete := strings.Join(elements[:len(elements)-1], " ") + " " + tag + " "
+			alfred.Add(alfred.Item{
+				Title:        tag,
+				Autocomplete: autocomplete,
+				Valid:        alfred.Bool(false),
+			})
+		}
+
 	default:
 		wordStr := strings.Join(words, " ")
 
@@ -201,14 +233,14 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		addDatabaseRowsToAlfred(rows)
+		addNoteRowsToAlfred(rows)
 
 		textRows, err := db.Query(fmt.Sprintf(NOTES_BY_TEXT, wordStr))
 		if err != nil {
 			panic(err)
 		}
 		newRows := getUniqueRows(rows, textRows)
-		addDatabaseRowsToAlfred(newRows)
+		addNoteRowsToAlfred(newRows)
 	}
 
 	alfred.Run()
