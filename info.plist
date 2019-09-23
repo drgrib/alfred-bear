@@ -24,7 +24,7 @@
 				<key>destinationuid</key>
 				<string>BA24168B-CD8A-466D-B58E-A82C047BA741</string>
 				<key>modifiers</key>
-				<integer>524288</integer>
+				<integer>1048576</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Link to Note</string>
 				<key>vitoclose</key>
@@ -47,7 +47,7 @@
 				<key>destinationuid</key>
 				<string>BA24168B-CD8A-466D-B58E-A82C047BA741</string>
 				<key>modifiers</key>
-				<integer>524288</integer>
+				<integer>1048576</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Link to Note</string>
 				<key>vitoclose</key>
