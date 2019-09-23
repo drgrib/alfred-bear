@@ -74,7 +74,7 @@ func AutocompleteTags(litedb db.LiteDB, q Query) (bool, error) {
 			autocomplete := strings.Join(q.Tokens[:len(q.Tokens)-1], " ") + " " + tag + " "
 			alfred.Add(alfred.Item{
 				Title:        tag,
-				Autocomplete: autocomplete,
+				Autocomplete: strings.TrimLeft(autocomplete, " "),
 				Valid:        alfred.Bool(false),
 			})
 		}
