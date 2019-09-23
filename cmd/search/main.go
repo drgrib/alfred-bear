@@ -10,35 +10,6 @@ import (
 	"github.com/drgrib/alfred-bear/db"
 )
 
-func getUniqueTagString(tagString string) string {
-	tags := strings.Split(tagString, ",")
-	uniqueTags := []string{}
-	for _, t := range tags {
-		isPrefix := false
-		for _, other := range tags {
-			if t != other && strings.HasPrefix(other, t) {
-				isPrefix = true
-				break
-			}
-		}
-		if !isPrefix {
-			uniqueTags = append(uniqueTags, t)
-		}
-	}
-	return "#" + strings.Join(uniqueTags, " #")
-}
-
-func addNoteRowsToAlfred(rows []map[string]string) {
-	for _, row := range rows {
-		alfred.Add(alfred.Item{
-			Title:    row[db.TitleKey],
-			Subtitle: getUniqueTagString(row[db.TagsKey]),
-			Arg:      row[db.NoteIDKey],
-			Valid:    alfred.Bool(true),
-		})
-	}
-}
-
 func main() {
 	query := os.Args[1]
 
@@ -86,7 +57,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		addNoteRowsToAlfred(rows)
+		db.AddNoteRowsToAlfred(rows)
 
 	case len(tags) != 0:
 		tagConditions := []string{}
@@ -99,7 +70,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		addNoteRowsToAlfred(rows)
+		db.AddNoteRowsToAlfred(rows)
 
 	default:
 
@@ -107,7 +78,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		addNoteRowsToAlfred(rows)
+		db.AddNoteRowsToAlfred(rows)
 	}
 
 	alfred.Run()
