@@ -6,9 +6,7 @@ import (
 	"global/comp"
 	"os/user"
 	"path/filepath"
-	"strings"
 
-	"github.com/drgrib/alfred"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -175,33 +173,4 @@ func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 		results = append(results, m)
 	}
 	return results, err
-}
-
-func getUniqueTagString(tagString string) string {
-	tags := strings.Split(tagString, ",")
-	uniqueTags := []string{}
-	for _, t := range tags {
-		isPrefix := false
-		for _, other := range tags {
-			if t != other && strings.HasPrefix(other, t) {
-				isPrefix = true
-				break
-			}
-		}
-		if !isPrefix {
-			uniqueTags = append(uniqueTags, t)
-		}
-	}
-	return "#" + strings.Join(uniqueTags, " #")
-}
-
-func AddNoteRowsToAlfred(rows []map[string]string) {
-	for _, row := range rows {
-		alfred.Add(alfred.Item{
-			Title:    row[TitleKey],
-			Subtitle: getUniqueTagString(row[TagsKey]),
-			Arg:      row[NoteIDKey],
-			Valid:    alfred.Bool(true),
-		})
-	}
 }
