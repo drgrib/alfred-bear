@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"global/comp"
+	"os/user"
+	"path/filepath"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -110,6 +112,15 @@ ORDER BY
 LIMIT 25
 `
 )
+
+func Expanduser(path string) string {
+	usr, _ := user.Current()
+	dir := usr.HomeDir
+	if path[:2] == "~/" {
+		path = filepath.Join(dir, path[2:])
+	}
+	return path
+}
 
 type LiteDB struct {
 	db *sql.DB
