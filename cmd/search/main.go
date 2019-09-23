@@ -19,21 +19,9 @@ func main() {
 		panic(err)
 	}
 
-	tokens := strings.Split(query, " ")
-	tags := []string{}
-	words := []string{}
-	for _, e := range tokens {
-		switch {
-		case e == "":
-		case strings.HasPrefix(e, "#"):
-			tags = append(tags, e)
-		default:
-			words = append(words, e)
-		}
-	}
-	wordStr := strings.Join(words, " ")
+	q := core.ParseQuery(query)
 
-	autocompleted, err := core.AutocompleteTags(litedb, tokens)
+	autocompleted, err := core.AutocompleteTags(litedb, q.Tokens)
 	if err != nil {
 		panic(err)
 	}
@@ -41,28 +29,28 @@ func main() {
 	switch {
 	case autocompleted:
 		// short-circuit others
-	case wordStr == "" && len(tags) == 0 && lastToken == "":
+	case q.WordString == "" && len(q.Tags) == 0 && q.LastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
 		if err != nil {
 			panic(err)
 		}
 		core.AddNoteRowsToAlfred(rows)
 
-	case len(tags) != 0:
+	case len(q.Tags) != 0:
 		tagConditions := []string{}
-		for _, t := range tags {
+		for _, t := range q.Tags {
 			c := fmt.Sprintf("lower(tag.ZTITLE) = lower('%s')", t[1:])
 			tagConditions = append(tagConditions, c)
 		}
 		tagConjunction := strings.Join(tagConditions, " OR ")
-		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_TAGS_AND_QUERY, tagConjunction, wordStr, wordStr, len(tags), wordStr))
+		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_TAGS_AND_QUERY, tagConjunction, q.WordString, q.WordString, len(q.Tags), q.WordString))
 		if err != nil {
 			panic(err)
 		}
 		core.AddNoteRowsToAlfred(rows)
 
 	default:
-		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_QUERY, wordStr, wordStr, wordStr))
+		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_QUERY, q.WordString, q.WordString, q.WordString))
 		if err != nil {
 			panic(err)
 		}

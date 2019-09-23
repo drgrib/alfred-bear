@@ -38,6 +38,30 @@ func AddNoteRowsToAlfred(rows []map[string]string) {
 	}
 }
 
+type Query struct {
+	Tokens, Tags          []string
+	LastToken, WordString string
+}
+
+func ParseQuery(query string) Query {
+	q := Query{}
+	q.Tokens = strings.Split(query, " ")
+	q.Tags = []string{}
+	words := []string{}
+	for _, e := range q.Tokens {
+		switch {
+		case e == "":
+		case strings.HasPrefix(e, "#"):
+			q.Tags = append(q.Tags, e)
+		default:
+			words = append(words, e)
+		}
+	}
+	q.LastToken = q.Tokens[len(q.Tokens)-1]
+	q.WordString = strings.Join(words, " ")
+	return q
+}
+
 func AutocompleteTags(litedb db.LiteDB, tokens []string) (bool, error) {
 	lastToken := tokens[len(tokens)-1]
 	if strings.HasPrefix(lastToken, "#") {
