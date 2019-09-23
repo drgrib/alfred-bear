@@ -3,7 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"global/comp"
 
+	"github.com/drgrib/alfred-bear/db"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -116,8 +118,14 @@ type LiteDB struct {
 
 func NewLiteDB(path string) (LiteDB, error) {
 	db, err := sql.Open("sqlite3", path)
-	lite := LiteDB{db}
-	return lite, err
+	litedb := LiteDB{db}
+	return litedb, err
+}
+
+func NewBearDB() (LiteDB, error) {
+	path := comp.Expanduser(db.DbPath)
+	litedb, err := NewLiteDB(path)
+	return litedb, err
 }
 
 func (lite LiteDB) Query(q string) ([]map[string]string, error) {

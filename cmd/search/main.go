@@ -8,6 +8,7 @@ import (
 	"github.com/drgrib/alfred"
 
 	"github.com/drgrib/alfred-bear/comp"
+	"github.com/drgrib/alfred-bear/db"
 )
 
 func getUniqueTagString(tagString string) string {
@@ -31,9 +32,9 @@ func getUniqueTagString(tagString string) string {
 func addNoteRowsToAlfred(rows []map[string]string) {
 	for _, row := range rows {
 		alfred.Add(alfred.Item{
-			Title:    row[TitleKey],
-			Subtitle: getUniqueTagString(row[TagsKey]),
-			Arg:      row[NoteIDKey],
+			Title:    row[db.TitleKey],
+			Subtitle: getUniqueTagString(row[db.TagsKey]),
+			Arg:      row[db.NoteIDKey],
 			Valid:    alfred.Bool(true),
 		})
 	}
@@ -42,8 +43,8 @@ func addNoteRowsToAlfred(rows []map[string]string) {
 func main() {
 	query := os.Args[1]
 
-	path := comp.Expanduser(DbPath)
-	litedb, err := NewLiteDB(path)
+	path := comp.Expanduser(db.DbPath)
+	litedb, err := db.NewLiteDB(path)
 	if err != nil {
 		panic(err)
 	}
