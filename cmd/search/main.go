@@ -19,11 +19,10 @@ func main() {
 		panic(err)
 	}
 
-	elements := strings.Split(query, " ")
+	tokens := strings.Split(query, " ")
 	tags := []string{}
 	words := []string{}
-	lastElement := ""
-	for _, e := range elements {
+	for _, e := range tokens {
 		switch {
 		case e == "":
 		case strings.HasPrefix(e, "#"):
@@ -31,12 +30,10 @@ func main() {
 		default:
 			words = append(words, e)
 		}
-		lastElement = e
 	}
-
 	wordStr := strings.Join(words, " ")
 
-	autocompleted, err := core.AutocompleteTags(litedb, elements)
+	autocompleted, err := core.AutocompleteTags(litedb, tokens)
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +41,7 @@ func main() {
 	switch {
 	case autocompleted:
 		// short-circuit others
-	case wordStr == "" && len(tags) == 0 && lastElement == "":
+	case wordStr == "" && len(tags) == 0 && lastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
 		if err != nil {
 			panic(err)

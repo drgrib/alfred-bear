@@ -38,17 +38,17 @@ func AddNoteRowsToAlfred(rows []map[string]string) {
 	}
 }
 
-func AutocompleteTags(litedb db.LiteDB, elements []string) (bool, error) {
-	lastElement := elements[len(elements)-1]
-	if strings.HasPrefix(lastElement, "#") {
-		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, lastElement[1:]))
+func AutocompleteTags(litedb db.LiteDB, tokens []string) (bool, error) {
+	lastToken := tokens[len(tokens)-1]
+	if strings.HasPrefix(lastToken, "#") {
+		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, lastToken[1:]))
 		if err != nil {
 			return false, err
 		}
 
 		for _, row := range rows {
 			tag := "#" + row[db.TitleKey]
-			autocomplete := strings.Join(elements[:len(elements)-1], " ") + " " + tag + " "
+			autocomplete := strings.Join(tokens[:len(tokens)-1], " ") + " " + tag + " "
 			alfred.Add(alfred.Item{
 				Title:        tag,
 				Autocomplete: autocomplete,
