@@ -177,22 +177,6 @@ func addNoteRowsToAlfred(rows []map[string]string) {
 	}
 }
 
-func getUniqueRows(currentRows, newRows []map[string]string) []map[string]string {
-	currentRowIDs := map[string]bool{}
-	for _, row := range currentRows {
-		currentRowIDs[row[NoteIDKey]] = true
-	}
-
-	uniqueRows := []map[string]string{}
-	for _, row := range newRows {
-		if _, ok := currentRowIDs[row[NoteIDKey]]; !ok {
-			uniqueRows = append(uniqueRows, row)
-		}
-	}
-
-	return uniqueRows
-}
-
 func main() {
 	query := os.Args[1]
 
