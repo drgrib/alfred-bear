@@ -52,12 +52,12 @@ func main() {
 			})
 		}
 
-	case len(words) == 0 && len(tags) == 0 && lastElement == "":
+	case wordStr == "" && len(tags) == 0 && lastElement == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
 		if err != nil {
 			panic(err)
 		}
-		db.AddNoteRowsToAlfred(rows)
+		core.AddNoteRowsToAlfred(rows)
 
 	case len(tags) != 0:
 		tagConditions := []string{}
@@ -70,7 +70,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		db.AddNoteRowsToAlfred(rows)
+		core.AddNoteRowsToAlfred(rows)
 
 	default:
 
@@ -78,7 +78,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		db.AddNoteRowsToAlfred(rows)
+		core.AddNoteRowsToAlfred(rows)
 	}
 
 	alfred.Run()
