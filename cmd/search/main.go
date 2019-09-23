@@ -21,31 +21,31 @@ const (
 
 	RECENT_NOTES = `
 SELECT DISTINCT
-    note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
 FROM
-    ZSFNOTE note
-    INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-    INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+	ZSFNOTE note
+	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
 WHERE
-    note.ZARCHIVED=0
-    AND note.ZTRASHED=0
+	note.ZARCHIVED=0
+	AND note.ZTRASHED=0
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY
-    note.ZMODIFICATIONDATE DESC
+	note.ZMODIFICATIONDATE DESC
 LIMIT 25
 `
 
 	NOTES_BY_QUERY = `
 SELECT DISTINCT
-    note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
 FROM
-    ZSFNOTE note
-    INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-    INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+	ZSFNOTE note
+	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
 WHERE
-    note.ZARCHIVED=0
-    AND note.ZTRASHED=0
-    AND (
+	note.ZARCHIVED=0
+	AND note.ZTRASHED=0
+	AND (
 		lower(note.ZTITLE) LIKE lower('%%%s%%') OR
 		lower(note.ZTEXT) LIKE lower('%%%s%%')
 	)
@@ -54,19 +54,49 @@ ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, no
 LIMIT 25
 `
 
+	NOTES_BY_TAGS_AND_QUERY = `
+SELECT DISTINCT
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+	ZSFNOTE note
+	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE note.ZUNIQUEIDENTIFIER IN (
+	SELECT
+		note.ZUNIQUEIDENTIFIER
+	FROM
+		ZSFNOTE note
+		INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+		INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+	WHERE
+		note.ZARCHIVED=0
+		AND note.ZTRASHED=0
+		AND (%s)
+		AND (
+			lower(note.ZTITLE) LIKE lower('%%%s%%') OR
+			lower(note.ZTEXT) LIKE lower('%%%s%%')
+		)
+	GROUP BY note.ZUNIQUEIDENTIFIER
+	HAVING COUNT(*) >= %d
+)
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
+LIMIT 25
+`
+
 	TAGS_BY_TITLE = `
 SELECT DISTINCT
-    t.ZTITLE
+	t.ZTITLE
 FROM
-    ZSFNOTE n
-    INNER JOIN Z_7TAGS nt ON n.Z_PK = nt.Z_7NOTES
-    INNER JOIN ZSFNOTETAG t ON nt.Z_14TAGS = t.Z_PK
+	ZSFNOTE n
+	INNER JOIN Z_7TAGS nt ON n.Z_PK = nt.Z_7NOTES
+	INNER JOIN ZSFNOTETAG t ON nt.Z_14TAGS = t.Z_PK
 WHERE
-    n.ZARCHIVED=0
-    AND n.ZTRASHED=0
-    AND lower(t.ZTITLE) LIKE lower('%%%s%%')
+	n.ZARCHIVED=0
+	AND n.ZTRASHED=0
+	AND lower(t.ZTITLE) LIKE lower('%%%s%%')
 ORDER BY
-    t.ZMODIFICATIONDATE DESC
+	t.ZMODIFICATIONDATE DESC
 LIMIT 25
 `
 )
@@ -133,7 +163,7 @@ func getUniqueTagString(tagString string) string {
 			uniqueTags = append(uniqueTags, t)
 		}
 	}
-	return "#" + strings.Join(uniqueTags, "# ")
+	return "#" + strings.Join(uniqueTags, " #")
 }
 
 func addNoteRowsToAlfred(rows []map[string]string) {
@@ -187,14 +217,9 @@ func main() {
 		lastElement = e
 	}
 
-	switch {
-	case len(words) == 0 && len(tags) == 0 && lastElement == "":
-		rows, err := db.Query(RECENT_NOTES)
-		if err != nil {
-			panic(err)
-		}
-		addNoteRowsToAlfred(rows)
+	wordStr := strings.Join(words, " ")
 
+	switch {
 	case strings.HasPrefix(lastElement, "#"):
 		rows, err := db.Query(fmt.Sprintf(TAGS_BY_TITLE, lastElement[1:]))
 		if err != nil {
@@ -211,8 +236,27 @@ func main() {
 			})
 		}
 
+	case len(words) == 0 && len(tags) == 0 && lastElement == "":
+		rows, err := db.Query(RECENT_NOTES)
+		if err != nil {
+			panic(err)
+		}
+		addNoteRowsToAlfred(rows)
+
+	case len(tags) != 0:
+		tagConditions := []string{}
+		for _, t := range tags {
+			c := fmt.Sprintf("lower(tag.ZTITLE) = lower('%s')", t[1:])
+			tagConditions = append(tagConditions, c)
+		}
+		tagConjunction := strings.Join(tagConditions, " OR ")
+		rows, err := db.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, wordStr, wordStr, len(tags), wordStr))
+		if err != nil {
+			panic(err)
+		}
+		addNoteRowsToAlfred(rows)
+
 	default:
-		wordStr := strings.Join(words, " ")
 
 		rows, err := db.Query(fmt.Sprintf(NOTES_BY_QUERY, wordStr, wordStr, wordStr))
 		if err != nil {
