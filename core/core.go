@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/drgrib/alfred"
@@ -35,4 +36,26 @@ func AddNoteRowsToAlfred(rows []map[string]string) {
 			Valid:    alfred.Bool(true),
 		})
 	}
+}
+
+func AutocompleteTags(litedb db.LiteDB, elements []string) (bool, error) {
+	lastElement := elements[len(elements)-1]
+	if strings.HasPrefix(lastElement, "#") {
+		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, lastElement[1:]))
+		if err != nil {
+			return false, err
+		}
+
+		for _, row := range rows {
+			tag := "#" + row[db.TitleKey]
+			autocomplete := strings.Join(elements[:len(elements)-1], " ") + " " + tag + " "
+			alfred.Add(alfred.Item{
+				Title:        tag,
+				Autocomplete: autocomplete,
+				Valid:        alfred.Bool(false),
+			})
+		}
+		return true, nil
+	}
+	return false, nil
 }
