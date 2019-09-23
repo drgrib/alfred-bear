@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"global/comp"
 	"os/user"
 	"path/filepath"
 
@@ -133,7 +132,7 @@ func NewLiteDB(path string) (LiteDB, error) {
 }
 
 func NewBearDB() (LiteDB, error) {
-	path := comp.Expanduser(DbPath)
+	path := Expanduser(DbPath)
 	litedb, err := NewLiteDB(path)
 	return litedb, err
 }
