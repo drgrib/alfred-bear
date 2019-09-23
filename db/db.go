@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"global/comp"
 
-	"github.com/drgrib/alfred-bear/db"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -123,7 +122,7 @@ func NewLiteDB(path string) (LiteDB, error) {
 }
 
 func NewBearDB() (LiteDB, error) {
-	path := comp.Expanduser(db.DbPath)
+	path := comp.Expanduser(DbPath)
 	litedb, err := NewLiteDB(path)
 	return litedb, err
 }

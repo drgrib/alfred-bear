@@ -7,7 +7,6 @@ import (
 
 	"github.com/drgrib/alfred"
 
-	"github.com/drgrib/alfred-bear/comp"
 	"github.com/drgrib/alfred-bear/db"
 )
 
@@ -43,8 +42,7 @@ func addNoteRowsToAlfred(rows []map[string]string) {
 func main() {
 	query := os.Args[1]
 
-	path := comp.Expanduser(db.DbPath)
-	litedb, err := db.NewLiteDB(path)
+	litedb, err := db.NewBearDB()
 	if err != nil {
 		panic(err)
 	}
