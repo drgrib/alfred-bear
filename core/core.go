@@ -62,17 +62,16 @@ func ParseQuery(query string) Query {
 	return q
 }
 
-func AutocompleteTags(litedb db.LiteDB, tokens []string) (bool, error) {
-	lastToken := tokens[len(tokens)-1]
-	if strings.HasPrefix(lastToken, "#") {
-		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, lastToken[1:]))
+func AutocompleteTags(litedb db.LiteDB, q Query) (bool, error) {
+	if strings.HasPrefix(q.LastToken, "#") {
+		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, q.LastToken[1:]))
 		if err != nil {
 			return false, err
 		}
 
 		for _, row := range rows {
 			tag := "#" + row[db.TitleKey]
-			autocomplete := strings.Join(tokens[:len(tokens)-1], " ") + " " + tag + " "
+			autocomplete := strings.Join(q.Tokens[:len(q.Tokens)-1], " ") + " " + tag + " "
 			alfred.Add(alfred.Item{
 				Title:        tag,
 				Autocomplete: autocomplete,

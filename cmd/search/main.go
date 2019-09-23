@@ -21,7 +21,7 @@ func main() {
 
 	q := core.ParseQuery(query)
 
-	autocompleted, err := core.AutocompleteTags(litedb, q.Tokens)
+	autocompleted, err := core.AutocompleteTags(litedb, q)
 	if err != nil {
 		panic(err)
 	}
