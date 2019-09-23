@@ -10,49 +10,49 @@ Just download the latest release and double-click _Bear.alfredworkflow_. Alfred 
 ### Recent Notes
 Leave the search field empty to see recent notes with their tags as subtitles.
 
-<img src="doc/RecentNotes.png" width="300">
+<img src="doc/RecentNotes.png" width="500">
 
 ### Basic Search
 Start typing to search through the titles and text of most recent notes, title matches first.
 
-<img src="doc/BasicSearch.png" width="300">
+<img src="doc/BasicSearch.png" width="500">
 
 ### Tag Search
 Type `#` at any time to autocomplete your tags.
 
-<img src="doc/TagAutocomplete.png" width="300">
+<img src="doc/TagAutocomplete.png" width="500">
 
 Start typing to search tags.
 
-<img src="doc/TagAutocompleteSearch.png" width="300">
+<img src="doc/TagAutocompleteSearch.png" width="500">
 
 Once completed, the notes will be filtered by that tag.
 
-<img src="doc/TagFilter.png" width="300">
+<img src="doc/TagFilter.png" width="500">
 
 Add more tags to filter by multiple tags.
 
-<img src="doc/TagAutocompleteMultiple.png" width="300">
+<img src="doc/TagAutocompleteMultiple.png" width="500">
 
 Start typing to search titles and text within a tag.
 
-<img src="doc/TagTextSearch.png" width="300">
+<img src="doc/TagTextSearch.png" width="500">
 
 All these terms can be typed in any order and they will work the same. For example, if you want to add a tag after typing a bare search term, the autocomplete will still help you. Or if you remember you want to filter by another tag after typing the first tag and a bare search term, you can autocomplete and add the second tag by typing `#` again.
 
-<img src="doc/TagAnyOrder.png" width="300">
+<img src="doc/TagAnyOrder.png" width="500">
 
 ### Link Pasting
 
 While in your Bear notes, you can paste a link to another note by searching for it and holding down the command key.
 
-<img src="doc/Link1.png" width="300">
-<img src="doc/Link2.png" width="300">
+<img src="doc/Link1.png" width="500">
+<img src="doc/Link2.png" width="500">
 
 ## New Notes
 `bn` or `bnew` followed by title and optional tags.
 
-<img src="doc/NewNote.png" width="300">
+<img src="doc/NewNote.png" width="500">
 
 Tag autocomplete works the same. Also, any text in your clipboard will automatically be added to the new note. Finally, the new note will be opened on creation unless you hold down the command key.
 
