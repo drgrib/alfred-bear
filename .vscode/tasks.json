@@ -1,0 +1,67 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "go build",
+            "dependsOn": [
+                "go build search",
+                "go build link",
+                "go build create",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+        },
+        {
+            "label": "go build search",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/search"
+            },
+            "command": "rm -f search; go build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "echo": false
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "go build link",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/link"
+            },
+            "command": "rm -f link; go build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "echo": false
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "go build create",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/create"
+            },
+            "command": "rm -f create; go build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "echo": false
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+    ]
+}

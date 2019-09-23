@@ -2,290 +2,125 @@ package db
 
 import (
 	"database/sql"
-	. "fmt"
-	"strings"
+	"fmt"
+	"global/comp"
+	"os/user"
+	"path/filepath"
 
 	_ "github.com/mattn/go-sqlite3"
-
-	"github.com/drgrib/alfred-bear/comp"
 )
 
-//////////////////////////////////////////////
-/// query templates
-//////////////////////////////////////////////
+const (
+	DbPath = "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite"
 
-const tagTemplate = `
-	SELECT DISTINCT
-		t.ZTITLE 
-	FROM 
-		ZSFNOTE n 
-		INNER JOIN Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES 
-		INNER JOIN ZSFNOTETAG t ON nt.Z_10TAGS = t.Z_PK 
-	WHERE 
-		n.ZARCHIVED=0 
-		AND n.ZTRASHED=0 
-		AND lower(t.ZTITLE) LIKE lower('%%%v%%')
-	ORDER BY 
-		t.ZMODIFICATIONDATE DESC 
+	TitleKey  = "ZTITLE"
+	TagsKey   = "group_concat(tag.ZTITLE)"
+	NoteIDKey = "ZUNIQUEIDENTIFIER"
+
+	RECENT_NOTES = `
+SELECT DISTINCT
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+	ZSFNOTE note
+	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE
+	note.ZARCHIVED=0
+	AND note.ZTRASHED=0
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY
+	note.ZMODIFICATIONDATE DESC
+LIMIT 25
 `
 
-const recentQuery = `
-	SELECT DISTINCT
-		ZUNIQUEIDENTIFIER, ZTITLE 
-	FROM 
-		ZSFNOTE 
-	WHERE 
-		ZARCHIVED=0 
-		AND ZTRASHED=0 
-	ORDER BY 
-		ZMODIFICATIONDATE DESC 
+	NOTES_BY_QUERY = `
+SELECT DISTINCT
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+	ZSFNOTE note
+	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE
+	note.ZARCHIVED=0
+	AND note.ZTRASHED=0
+	AND (
+		lower(note.ZTITLE) LIKE lower('%%%s%%') OR
+		lower(note.ZTEXT) LIKE lower('%%%s%%')
+	)
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
+LIMIT 25
 `
 
-const titleByIDTemplate = `
-	SELECT DISTINCT
-		ZTITLE 
-	FROM 
-		ZSFNOTE 
-	WHERE 
-		ZARCHIVED=0 
-		AND ZTRASHED=0 
-		AND ZUNIQUEIDENTIFIER='%v' 
-	ORDER BY 
-		ZMODIFICATIONDATE DESC 
-`
-
-const notesByTitleTemplate = `
-	SELECT DISTINCT
-		ZUNIQUEIDENTIFIER, ZTITLE 
-	FROM 
-		ZSFNOTE 
-	WHERE 
-		ZARCHIVED=0 
-		AND ZTRASHED=0 
-		AND lower(ZTITLE) LIKE lower('%%%v%%')
-	ORDER BY 
-		ZMODIFICATIONDATE DESC 
-`
-
-const notesByTextTemplate = `
-	SELECT DISTINCT
-		ZUNIQUEIDENTIFIER, ZTITLE 
-	FROM 
-		ZSFNOTE 
-	WHERE 
-		ZARCHIVED=0 
-		AND ZTRASHED=0 
-		AND lower(ZTEXT) LIKE lower('%%%v%%')
-	ORDER BY 
-		ZMODIFICATIONDATE DESC 
-`
-
-const notesByTagsTemplate = `
-	SELECT DISTINCT
-		note.ZUNIQUEIDENTIFIER, note.ZTITLE
+	NOTES_BY_TAGS_AND_QUERY = `
+SELECT DISTINCT
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+	ZSFNOTE note
+	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE note.ZUNIQUEIDENTIFIER IN (
+	SELECT
+		note.ZUNIQUEIDENTIFIER
 	FROM
 		ZSFNOTE note
-		INNER JOIN Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
-		INNER JOIN ZSFNOTETAG tag ON nTag.Z_10TAGS = tag.Z_PK
+		INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+		INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
 	WHERE
 		note.ZARCHIVED=0
 		AND note.ZTRASHED=0
-		AND (%v)
-		AND %v
+		AND (%s)
+		AND (
+			lower(note.ZTITLE) LIKE lower('%%%s%%') OR
+			lower(note.ZTEXT) LIKE lower('%%%s%%')
+		)
 	GROUP BY note.ZUNIQUEIDENTIFIER
-	HAVING COUNT(*) >= %v
-	ORDER BY
-		note.ZMODIFICATIONDATE DESC
+	HAVING COUNT(*) >= %d
+)
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
+LIMIT 25
 `
 
-//////////////////////////////////////////////
-/// Note
-//////////////////////////////////////////////
+	TAGS_BY_TITLE = `
+SELECT DISTINCT
+	t.ZTITLE
+FROM
+	ZSFNOTE n
+	INNER JOIN Z_7TAGS nt ON n.Z_PK = nt.Z_7NOTES
+	INNER JOIN ZSFNOTETAG t ON nt.Z_14TAGS = t.Z_PK
+WHERE
+	n.ZARCHIVED=0
+	AND n.ZTRASHED=0
+	AND lower(t.ZTITLE) LIKE lower('%%%s%%')
+ORDER BY
+	t.ZMODIFICATIONDATE DESC
+LIMIT 25
+`
 
-type Note struct {
-	ID, Title string
-}
+	NOTE_TITLE_BY_ID = `
+SELECT DISTINCT
+    ZTITLE
+FROM
+    ZSFNOTE
+WHERE
+    ZARCHIVED=0
+    AND ZTRASHED=0
+    AND ZUNIQUEIDENTIFIER='%s'
+ORDER BY
+    ZMODIFICATIONDATE DESC
+LIMIT 25
+`
+)
 
-//////////////////////////////////////////////
-/// NoteList
-//////////////////////////////////////////////
-
-type NoteList struct {
-	set   map[Note]bool
-	slice []Note
-}
-
-func NewNoteList() NoteList {
-	notes := NoteList{
-		set:   map[Note]bool{},
-		slice: []Note{},
+func Expanduser(path string) string {
+	usr, _ := user.Current()
+	dir := usr.HomeDir
+	if path[:2] == "~/" {
+		path = filepath.Join(dir, path[2:])
 	}
-	return notes
+	return path
 }
-
-func (notes NoteList) Contains(n Note) bool {
-	_, exists := notes.set[n]
-	return exists
-}
-
-func (notes *NoteList) AppendNew(other ...Note) {
-	for _, n := range other {
-		if !notes.Contains(n) {
-			notes.slice = append(notes.slice, n)
-			notes.set[n] = true
-		}
-	}
-}
-
-func (notes *NoteList) AppendNewFrom(other NoteList) {
-	notes.AppendNew(other.slice...)
-}
-
-func (notes NoteList) String() string {
-	return Sprintf("NoteList%s", notes.slice)
-}
-
-func (notes NoteList) GetSlice() []Note {
-	return notes.slice
-}
-
-func (notes NoteList) Get(i int) Note {
-	return notes.slice[i]
-}
-
-func (notes NoteList) Len() int {
-	return len(notes.slice)
-}
-
-//////////////////////////////////////////////
-/// BearDB
-//////////////////////////////////////////////
-
-type BearDB struct {
-	lite  LiteDB
-	limit int
-}
-
-func NewBearDB() (BearDB, error) {
-	path := comp.Expanduser("~/Library/Containers/net.shinyfrog.bear/Data/Documents/Application Data/database.sqlite")
-	lite, err := NewLiteDB(path)
-	limit := 25
-	db := BearDB{lite, limit}
-	return db, err
-}
-
-func (db BearDB) limitQuery(q string) string {
-	return Sprintf("%s LIMIT %v", q, db.limit)
-}
-
-func (db BearDB) SearchTags(s string) ([]string, error) {
-	q := Sprintf(tagTemplate, s)
-	q = db.limitQuery(q)
-	tags, err := db.lite.QueryStrings(q)
-	return tags, err
-}
-
-func toNoteSlice(maps []map[string]string) []Note {
-	notes := []Note{}
-	for _, m := range maps {
-		n := Note{
-			ID:    m["ZUNIQUEIDENTIFIER"],
-			Title: m["ZTITLE"],
-		}
-		notes = append(notes, n)
-	}
-	return notes
-}
-
-func (db BearDB) QueryNotes(query string) (NoteList, error) {
-	q := db.limitQuery(query)
-	maps, err := db.lite.QueryStringMaps(q)
-	notes := NewNoteList()
-	if err != nil {
-		return notes, err
-	}
-	slice := toNoteSlice(maps)
-	notes.AppendNew(slice...)
-	return notes, err
-}
-
-func (db BearDB) GetRecent() (NoteList, error) {
-	notes, err := db.QueryNotes(recentQuery)
-	return notes, err
-}
-
-func (db BearDB) GetTitle(id string) (string, error) {
-	q := Sprintf(titleByIDTemplate, id)
-	q = db.limitQuery(q)
-	titles, err := db.lite.QueryStrings(q)
-	if err != nil {
-		return "", err
-	}
-	if len(titles) == 0 {
-		return "", Errorf(
-			"No notes for ID '%v'", id)
-	}
-	return titles[0], err
-}
-
-func (db BearDB) gapQuery(template, fill string) (NoteList, error) {
-	q := Sprintf(template, fill)
-	notes, err := db.QueryNotes(q)
-	if err != nil {
-		return notes, err
-	}
-	split := strings.Split(fill, " ")
-	if len(split) > 1 {
-		// word gap search
-		join := strings.Join(split, "% %")
-		q := Sprintf(template, join)
-		moreNotes, err := db.QueryNotes(q)
-		if err != nil {
-			return notes, err
-		}
-		notes.AppendNewFrom(moreNotes)
-	}
-	return notes, err
-}
-
-func (db BearDB) SearchNotesByTitle(title string) (NoteList, error) {
-	notes, err := db.gapQuery(notesByTitleTemplate, title)
-	return notes, err
-}
-
-func (db BearDB) SearchNotesByText(text string) (NoteList, error) {
-	notes, err := db.gapQuery(notesByTextTemplate, text)
-	return notes, err
-}
-
-func (db BearDB) SearchNotes(text string) (NoteList, error) {
-	titleNotes, err := db.SearchNotesByTitle(text)
-	if err != nil {
-		return titleNotes, err
-	}
-	textNotes, err := db.SearchNotesByText(text)
-	if err != nil {
-		return titleNotes, err
-	}
-	titleNotes.AppendNewFrom(textNotes)
-	return titleNotes, err
-}
-
-func (db BearDB) buildTagTemplate(tags []string) string {
-	whereTemplate := "lower(tag.ZTITLE) = lower('%v')"
-	whereSlice := []string{}
-	for _, t := range tags {
-
-	}
-}
-
-func (db BearDB) SearchNotesByTitleWithTags(title string, tags []string) (NoteList, error) {
-
-}
-
-//////////////////////////////////////////////
-/// LiteDB
-//////////////////////////////////////////////
 
 type LiteDB struct {
 	db *sql.DB
@@ -293,28 +128,34 @@ type LiteDB struct {
 
 func NewLiteDB(path string) (LiteDB, error) {
 	db, err := sql.Open("sqlite3", path)
-	lite := LiteDB{db}
-	return lite, err
+	litedb := LiteDB{db}
+	return litedb, err
 }
 
-func (lite LiteDB) Query(q string) ([]map[string]interface{}, error) {
-	results := []map[string]interface{}{}
+func NewBearDB() (LiteDB, error) {
+	path := comp.Expanduser(DbPath)
+	litedb, err := NewLiteDB(path)
+	return litedb, err
+}
+
+func (lite LiteDB) Query(q string) ([]map[string]string, error) {
+	results := []map[string]string{}
 	rows, err := lite.db.Query(q)
 	if err != nil {
 		return results, err
 	}
 	defer rows.Close()
-	// credit
-	// https://kylewbanks.com/blog/query-result-to-map-in-golang
+
 	cols, err := rows.Columns()
 	if err != nil {
 		return results, err
 	}
+
 	for rows.Next() {
-		m := make(map[string]interface{})
+		m := map[string]string{}
 		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
-		for i, _ := range columns {
+		for i := range columns {
 			columnPointers[i] = &columns[i]
 		}
 		if err := rows.Scan(columnPointers...); err != nil {
@@ -322,51 +163,14 @@ func (lite LiteDB) Query(q string) ([]map[string]interface{}, error) {
 		}
 		for i, colName := range cols {
 			val := columnPointers[i].(*interface{})
-			m[colName] = *val
+			uints, ok := (*val).([]uint8)
+			if ok {
+				m[colName] = string(uints)
+			} else {
+				return results, fmt.Errorf("Problem converting record to values to strings for %#v", *val)
+			}
 		}
 		results = append(results, m)
 	}
 	return results, err
-}
-
-func B2S(bs []uint8) string {
-	// credit
-	// https://stackoverflow.com/a/28848879/130427
-	b := make([]byte, len(bs))
-	for i, v := range bs {
-		b[i] = byte(v)
-	}
-	return string(b)
-}
-
-func (lite LiteDB) QueryStringMaps(q string) ([]map[string]string, error) {
-	sResults := []map[string]string{}
-	iResults, err := lite.Query(q)
-	if err != nil {
-		return sResults, err
-	}
-	for _, iMap := range iResults {
-		sMap := map[string]string{}
-		for k, v := range iMap {
-			sMap[k] = B2S(v.([]uint8))
-		}
-		sResults = append(sResults, sMap)
-	}
-	return sResults, err
-}
-
-func (lite LiteDB) QueryStrings(q string) ([]string, error) {
-	sResults := []string{}
-	iResults, err := lite.Query(q)
-	if err != nil {
-		return sResults, err
-	}
-	for _, iMap := range iResults {
-		s := ""
-		for _, v := range iMap {
-			s = B2S(v.([]uint8))
-		}
-		sResults = append(sResults, s)
-	}
-	return sResults, err
 }
