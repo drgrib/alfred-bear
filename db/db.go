@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/drgrib/alfred"
-	"github.com/drgrib/alfred-bear/db"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -199,9 +198,9 @@ func getUniqueTagString(tagString string) string {
 func AddNoteRowsToAlfred(rows []map[string]string) {
 	for _, row := range rows {
 		alfred.Add(alfred.Item{
-			Title:    row[db.TitleKey],
-			Subtitle: getUniqueTagString(row[db.TagsKey]),
-			Arg:      row[db.NoteIDKey],
+			Title:    row[TitleKey],
+			Subtitle: getUniqueTagString(row[TagsKey]),
+			Arg:      row[NoteIDKey],
 			Valid:    alfred.Bool(true),
 		})
 	}
