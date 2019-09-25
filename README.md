@@ -54,7 +54,7 @@ While in your Bear notes, you can paste a link to another note by searching for 
 
 <img src="doc/NewNote.png" width="500">
 
-Tag autocomplete works the same. Also, any text in your clipboard will automatically be added to the new note. Finally, the new note will be opened on creation unless you hold down the command key.
+Tag autocomplete works the same. Also, any text in your clipboard can be added to the new note by holding down the command key.
 
 ## Why I created this
 I am especially grateful to Chris Brown, who created a [Python based Bear workflow](https://github.com/chrisbro/alfred-bear). It was the basis for this project. However, I decided to create my own project for a few reasons:
