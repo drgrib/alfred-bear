@@ -306,7 +306,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes"</string>
+				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes&amp;edit=yes"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -427,7 +427,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes"</string>
+				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes&amp;edit=yes"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
