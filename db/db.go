@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"global/comp"
 	"os/user"
 	"path/filepath"
@@ -18,28 +17,28 @@ const (
 	NoteIDKey = "ZUNIQUEIDENTIFIER"
 
 	RECENT_NOTES = `
-SELECT DISTINCT
-	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
-FROM
-	ZSFNOTE note
-	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
-WHERE
-	note.ZARCHIVED=0
-	AND note.ZTRASHED=0
-GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY
-	note.ZMODIFICATIONDATE DESC
-LIMIT 25
-`
+	SELECT DISTINCT
+		note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+	FROM
+		ZSFNOTE note
+		LEFT OUTER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+		LEFT OUTER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+	WHERE
+		note.ZARCHIVED=0
+		AND note.ZTRASHED=0
+	GROUP BY note.ZUNIQUEIDENTIFIER
+	ORDER BY
+		note.ZMODIFICATIONDATE DESC
+	LIMIT 25
+	`
 
 	NOTES_BY_QUERY = `
 SELECT DISTINCT
 	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
 FROM
 	ZSFNOTE note
-	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+	LEFT OUTER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	LEFT OUTER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
 WHERE
 	note.ZARCHIVED=0
 	AND note.ZTRASHED=0
@@ -167,7 +166,7 @@ func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 			if ok {
 				m[colName] = string(uints)
 			} else {
-				return results, fmt.Errorf("Problem converting record to values to strings for %#v", *val)
+				m[colName] = ""
 			}
 		}
 		results = append(results, m)

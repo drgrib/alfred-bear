@@ -10,6 +10,9 @@ import (
 )
 
 func getUniqueTagString(tagString string) string {
+	if tagString == "" {
+		return ""
+	}
 	tags := strings.Split(tagString, ",")
 	uniqueTags := []string{}
 	for _, t := range tags {
