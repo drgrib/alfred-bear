@@ -62,10 +62,23 @@
 				<key>modifiers</key>
 				<integer>1048576</integer>
 				<key>modifiersubtext</key>
-				<string>Create in Background</string>
+				<string>Paste Clipboard Contents</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>A9ED2D55-877D-48BB-8BEA-52B75BBDFBB0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A9ED2D55-877D-48BB-8BEA-52B75BBDFBB0</key>
+		<array>
 			<dict>
 				<key>destinationuid</key>
 				<string>F87F086C-E82A-4855-99B0-77B3A670A9E1</string>
@@ -98,13 +111,13 @@
 				<key>modifiers</key>
 				<integer>1048576</integer>
 				<key>modifiersubtext</key>
-				<string>Create in Background</string>
+				<string>Paste Clipboard Contents</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
-				<string>F87F086C-E82A-4855-99B0-77B3A670A9E1</string>
+				<string>A9ED2D55-877D-48BB-8BEA-52B75BBDFBB0</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -293,7 +306,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>open "bear://x-callback-url/create?{query}&amp;show_window=no"</string>
+				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes&amp;edit=yes"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -414,7 +427,7 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes"</string>
+				<string>open "bear://x-callback-url/create?{query}&amp;show_window=yes&amp;new_window=yes&amp;edit=yes"</string>
 				<key>scriptargtype</key>
 				<integer>0</integer>
 				<key>scriptfile</key>
@@ -426,6 +439,27 @@
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>F87F086C-E82A-4855-99B0-77B3A670A9E1</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>matchmode</key>
+				<integer>1</integer>
+				<key>matchstring</key>
+				<string>&amp;text=.+</string>
+				<key>regexcaseinsensitive</key>
+				<false/>
+				<key>regexmultiline</key>
+				<false/>
+				<key>replacestring</key>
+				<string></string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.replace</string>
+			<key>uid</key>
+			<string>A9ED2D55-877D-48BB-8BEA-52B75BBDFBB0</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -444,9 +478,9 @@
 		<key>48D75AAC-E443-4352-9CA2-272209D8E32F</key>
 		<dict>
 			<key>xpos</key>
-			<integer>370</integer>
+			<integer>550</integer>
 			<key>ypos</key>
-			<integer>270</integer>
+			<integer>330</integer>
 		</dict>
 		<key>7B98A1ED-9AEE-42E6-8588-CF47DE5C3353</key>
 		<dict>
@@ -460,7 +494,7 @@
 			<key>xpos</key>
 			<integer>130</integer>
 			<key>ypos</key>
-			<integer>270</integer>
+			<integer>330</integer>
 		</dict>
 		<key>A51B1B56-05DA-496D-BC57-1DC749BD47C0</key>
 		<dict>
@@ -468,6 +502,13 @@
 			<integer>550</integer>
 			<key>ypos</key>
 			<integer>140</integer>
+		</dict>
+		<key>A9ED2D55-877D-48BB-8BEA-52B75BBDFBB0</key>
+		<dict>
+			<key>xpos</key>
+			<integer>400</integer>
+			<key>ypos</key>
+			<integer>505</integer>
 		</dict>
 		<key>AFE5F463-A74B-446F-AC60-C5CC37F9E035</key>
 		<dict>
@@ -488,17 +529,21 @@
 			<key>xpos</key>
 			<integer>10</integer>
 			<key>ypos</key>
-			<integer>400</integer>
+			<integer>475</integer>
 		</dict>
 		<key>F87F086C-E82A-4855-99B0-77B3A670A9E1</key>
 		<dict>
 			<key>xpos</key>
-			<integer>370</integer>
+			<integer>550</integer>
 			<key>ypos</key>
-			<integer>400</integer>
+			<integer>475</integer>
 		</dict>
 	</dict>
+	<key>variablesdontexport</key>
+	<array/>
+	<key>version</key>
+	<string>1.0.2</string>
 	<key>webaddress</key>
-	<string>https://github.com/drgrib</string>
+	<string>https://github.com/drgrib/alfred-bear</string>
 </dict>
 </plist>

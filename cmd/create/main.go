@@ -46,7 +46,7 @@ func main() {
 			panic(err)
 		}
 		if clipString != "" {
-			callback = append(callback, "&text="+url.PathEscape(clipString))
+			callback = append(callback, "text="+url.PathEscape(clipString))
 		}
 		callbackString := strings.Join(callback, "&")
 

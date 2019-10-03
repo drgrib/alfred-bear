@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"global/comp"
 	"os/user"
 	"path/filepath"
 
@@ -17,19 +16,19 @@ const (
 	NoteIDKey = "ZUNIQUEIDENTIFIER"
 
 	RECENT_NOTES = `
-	SELECT DISTINCT
-		note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
-	FROM
-		ZSFNOTE note
-		LEFT OUTER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-		LEFT OUTER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
-	WHERE
-		note.ZARCHIVED=0
-		AND note.ZTRASHED=0
-	GROUP BY note.ZUNIQUEIDENTIFIER
-	ORDER BY
-		note.ZMODIFICATIONDATE DESC
-	LIMIT 25
+SELECT DISTINCT
+	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+FROM
+	ZSFNOTE note
+	LEFT OUTER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
+	LEFT OUTER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+WHERE
+	note.ZARCHIVED=0
+	AND note.ZTRASHED=0
+GROUP BY note.ZUNIQUEIDENTIFIER
+ORDER BY
+	note.ZMODIFICATIONDATE DESC
+LIMIT 25
 	`
 
 	NOTES_BY_QUERY = `
@@ -132,7 +131,7 @@ func NewLiteDB(path string) (LiteDB, error) {
 }
 
 func NewBearDB() (LiteDB, error) {
-	path := comp.Expanduser(DbPath)
+	path := Expanduser(DbPath)
 	litedb, err := NewLiteDB(path)
 	return litedb, err
 }
