@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/drgrib/alfred"
@@ -27,6 +28,7 @@ func getUniqueTagString(tagString string) string {
 			uniqueTags = append(uniqueTags, t)
 		}
 	}
+	sort.Strings(uniqueTags)
 	return "#" + strings.Join(uniqueTags, " #")
 }
 
