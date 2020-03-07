@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"golang.org/x/text/unicode/norm"
+
 	"github.com/drgrib/alfred-bear/db"
 )
 
 func main() {
-	noteID := os.Args[1]
+	noteID := norm.NFC.String(os.Args[1])
 
 	litedb, err := db.NewBearDB()
 	if err != nil {

@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/drgrib/alfred"
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/drgrib/alfred-bear/core"
 	"github.com/drgrib/alfred-bear/db"
 )
 
 func main() {
-	query := os.Args[1]
+	query := norm.NFC.String(os.Args[1])
 
 	litedb, err := db.NewBearDB()
 	if err != nil {
