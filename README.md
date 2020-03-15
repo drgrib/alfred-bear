@@ -63,7 +63,7 @@ You may find that sometimes you want to retrieve a note if it exists but then cr
 
 <img src="doc/CreateSearch1.png" width="500">
 
-If there are less than two search terms, the create item will be the last or only item.
+If there are less than two search items, the create item will be the last or only item.
 
 <img src="doc/CreateSearch2.png" width="500">
 
