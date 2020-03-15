@@ -24,7 +24,7 @@ func main() {
 	}
 
 	if !autocompleted {
-		searchRows, err := core.GetSearchItems(litedb, query)
+		searchRows, err := core.GetSearchRows(litedb, query)
 		if err != nil {
 			panic(err)
 		}
