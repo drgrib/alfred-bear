@@ -96,7 +96,7 @@ func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 	return false, nil
 }
 
-func GetSearchItems(litedb db.LiteDB, query Query) ([]map[string]string, error) {
+func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
 	switch {
 	case query.WordString == "" && len(query.Tags) == 0 && query.LastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
