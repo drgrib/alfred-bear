@@ -33,8 +33,10 @@ func main() {
 			panic(err)
 		}
 
-		for _, row := range searchRows[:createIndex] {
-			alfred.Add(core.RowToItem(row))
+		if len(searchRows) > 0 {
+			for _, row := range searchRows[:createIndex] {
+				alfred.Add(core.RowToItem(row))
+			}
 		}
 		alfred.Add(*createItem)
 		if len(searchRows) > 0 {
