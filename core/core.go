@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/drgrib/alfred"
+	"golang.org/x/text/unicode/norm"
 
 	"github.com/drgrib/alfred-bear/db"
 )
