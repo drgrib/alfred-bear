@@ -35,14 +35,18 @@ func getUniqueTagString(tagString string) string {
 	return "#" + strings.Join(uniqueTags, " #")
 }
 
+func RowToItem(row map[string]string) alfred.Item {
+	return alfred.Item{
+		Title:    row[db.TitleKey],
+		Subtitle: getUniqueTagString(row[db.TagsKey]),
+		Arg:      row[db.NoteIDKey],
+		Valid:    alfred.Bool(true),
+	}
+}
+
 func AddNoteRowsToAlfred(rows []map[string]string) {
 	for _, row := range rows {
-		alfred.Add(alfred.Item{
-			Title:    row[db.TitleKey],
-			Subtitle: getUniqueTagString(row[db.TagsKey]),
-			Arg:      row[db.NoteIDKey],
-			Valid:    alfred.Bool(true),
-		})
+		alfred.Add(RowToItem(row))
 	}
 }
 
@@ -84,6 +88,7 @@ func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 				Title:        tag,
 				Autocomplete: strings.TrimLeft(autocomplete, " "),
 				Valid:        alfred.Bool(false),
+				UID:          tag,
 			})
 		}
 		return true, nil
@@ -91,7 +96,7 @@ func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 	return false, nil
 }
 
-func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
+func GetSearchItems(litedb db.LiteDB, query Query) ([]map[string]string, error) {
 	switch {
 	case query.WordString == "" && len(query.Tags) == 0 && query.LastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
