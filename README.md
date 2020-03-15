@@ -56,6 +56,19 @@ While in your Bear notes, you can paste a link to another note by searching for 
 
 Tag autocomplete works the same. Also, any text in your clipboard can be added to the new note by holding down the command key.
 
+## Create/Search
+`bcs` or `bcsearch`
+
+You may find sometimes that you want to retrieve a note if it exists and create it if it does not. This command provides that functionality by combining the behavior of search and create. It will provide all the same search results as normal search and additionally add a create item third in the list using normal create options.
+
+<img src="doc/CreateSearch1.png" width="500">
+
+If there are less than two search items, the create item will be the last or only item.
+
+<img src="doc/CreateSearch2.png" width="500">
+
+You can additionally create links to notes by holding the command key while selecting a search item. Selecting the create item while holding the command key will do nothing.
+
 ## Why I created this
 I am especially grateful to Chris Brown, who created a [Python based Bear workflow](https://github.com/chrisbro/alfred-bear). It was the basis for this project. However, I decided to create my own project for a few reasons:
 

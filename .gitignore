@@ -1,4 +1,5 @@
 .DS_Store
-cmd/search/search
-cmd/link/link
 cmd/create/create
+cmd/csearch/csearch
+cmd/link/link
+cmd/search/search

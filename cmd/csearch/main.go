@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	createIndex := 2
 	query := core.ParseQuery(os.Args[1])
 
 	litedb, err := db.NewBearDB()
@@ -23,16 +24,25 @@ func main() {
 	}
 
 	if !autocompleted {
-		rows, err := core.GetSearchRows(litedb, query)
+		searchRows, err := core.GetSearchRows(litedb, query)
 		if err != nil {
 			panic(err)
 		}
-		core.AddNoteRowsToAlfred(rows)
-		if len(rows) == 0 {
-			alfred.Add(alfred.Item{
-				Title: "No matching items found",
-				Valid: alfred.Bool(false),
-			})
+		createItem, err := core.GetCreateItem(query)
+		if err != nil {
+			panic(err)
+		}
+
+		if len(searchRows) > 0 {
+			for _, row := range searchRows[:createIndex] {
+				alfred.Add(core.RowToItem(row))
+			}
+		}
+		alfred.Add(*createItem)
+		if len(searchRows) > 0 {
+			for _, row := range searchRows[createIndex:] {
+				alfred.Add(core.RowToItem(row))
+			}
 		}
 	}
 

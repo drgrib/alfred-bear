@@ -6,6 +6,7 @@
         {
             "label": "go build",
             "dependsOn": [
+                "go build csearch",
                 "go build search",
                 "go build link",
                 "go build create",
@@ -14,6 +15,22 @@
                 "kind": "build",
                 "isDefault": true
             },
+        },
+        {
+            "label": "go build csearch",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/csearch"
+            },
+            "command": "rm -f csearch; go build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "echo": false
+            },
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "go build search",
