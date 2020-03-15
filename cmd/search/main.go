@@ -28,6 +28,12 @@ func main() {
 			panic(err)
 		}
 		core.AddNoteRowsToAlfred(rows)
+		if len(rows) == 0 {
+			alfred.Add(alfred.Item{
+				Title: "No matching items found",
+				Valid: alfred.Bool(false),
+			})
+		}
 	}
 
 	alfred.Run()
