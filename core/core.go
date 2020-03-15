@@ -2,9 +2,11 @@ package core
 
 import (
 	"fmt"
+	"net/url"
 	"sort"
 	"strings"
 
+	"github.com/atotto/clipboard"
 	"github.com/drgrib/alfred"
 	"golang.org/x/text/unicode/norm"
 
@@ -118,4 +120,37 @@ func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
 		}
 		return rows, nil
 	}
+}
+
+func GetCreateItem(query Query) (*alfred.Item, error) {
+	callback := []string{}
+	if query.WordString != "" {
+		callback = append(callback, "title="+url.PathEscape(query.WordString))
+	}
+	if len(query.Tags) != 0 {
+		bareTags := []string{}
+		for _, t := range query.Tags {
+			bareTags = append(bareTags, url.PathEscape(t[1:]))
+		}
+		callback = append(callback, "tags="+strings.Join(bareTags, ","))
+	}
+
+	clipString, err := clipboard.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+	if clipString != "" {
+		callback = append(callback, "text="+url.PathEscape(clipString))
+	}
+	callbackString := strings.Join(callback, "&")
+
+	item := alfred.Item{
+		Title: fmt.Sprintf("Create %#v", query.WordString),
+		Arg:   callbackString,
+		Valid: alfred.Bool(true),
+	}
+	if len(query.Tags) != 0 {
+		item.Subtitle = strings.Join(query.Tags, " ")
+	}
+	return &item, nil
 }

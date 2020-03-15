@@ -1,12 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"net/url"
 	"os"
-	"strings"
 
-	"github.com/atotto/clipboard"
 	"github.com/drgrib/alfred"
 
 	"github.com/drgrib/alfred-bear/core"
@@ -27,36 +23,11 @@ func main() {
 	}
 
 	if !autocompleted {
-		callback := []string{}
-		if query.WordString != "" {
-			callback = append(callback, "title="+url.PathEscape(query.WordString))
-		}
-		if len(query.Tags) != 0 {
-			bareTags := []string{}
-			for _, t := range query.Tags {
-				bareTags = append(bareTags, url.PathEscape(t[1:]))
-			}
-			callback = append(callback, "tags="+strings.Join(bareTags, ","))
-		}
-
-		clipString, err := clipboard.ReadAll()
+		item, err := core.GetCreateItem(query)
 		if err != nil {
 			panic(err)
 		}
-		if clipString != "" {
-			callback = append(callback, "text="+url.PathEscape(clipString))
-		}
-		callbackString := strings.Join(callback, "&")
-
-		item := alfred.Item{
-			Title: fmt.Sprintf("Create %#v", query.WordString),
-			Arg:   callbackString,
-			Valid: alfred.Bool(true),
-		}
-		if len(query.Tags) != 0 {
-			item.Subtitle = strings.Join(query.Tags, " ")
-		}
-		alfred.Add(item)
+		alfred.Add(*item)
 	}
 
 	alfred.Run()
