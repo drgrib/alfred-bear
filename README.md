@@ -67,6 +67,8 @@ If there are less than two search items, the create item will be the last or onl
 
 <img src="doc/CreateSearch2.png" width="500">
 
+You can additionally create links to notes by holding the command key while selecting a search item. Selecting the create item while holding the command key will do nothing.
+
 ## Why I created this
 I am especially grateful to Chris Brown, who created a [Python based Bear workflow](https://github.com/chrisbro/alfred-bear). It was the basis for this project. However, I decided to create my own project for a few reasons:
 
