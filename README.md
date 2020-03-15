@@ -59,7 +59,7 @@ Tag autocomplete works the same. Also, any text in your clipboard can be added t
 ## Create/Search
 `bcs` or `bcsearch`
 
-You may find that sometimes you want to retrieve a note if it exists but then create it if it does not. This command provides that functionality by combining the behavior of search and create. It will provide all the same search results as normal search and additionally add a create item using normal create options as the third item.
+You may find that sometimes you want to retrieve a note if it exists but then create it if it does not. This command provides that functionality by combining the behavior of search and create. It will provide all the same search results as normal search and additionally add a create item third in the list using normal create options.
 
 <img src="doc/CreateSearch1.png" width="500">
 
