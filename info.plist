@@ -666,7 +666,7 @@
 			<key>type</key>
 			<string>alfred.workflow.utility.delay</string>
 			<key>uid</key>
-			<string>A13A42DF-9317-4663-9BF5-90026ABE38A9</string>
+			<string>007F8BC3-C54B-4D26-A47E-AA17951C84C2</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -679,7 +679,7 @@
 			<key>type</key>
 			<string>alfred.workflow.utility.delay</string>
 			<key>uid</key>
-			<string>007F8BC3-C54B-4D26-A47E-AA17951C84C2</string>
+			<string>A13A42DF-9317-4663-9BF5-90026ABE38A9</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -930,7 +930,7 @@
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.0.6</string>
+	<string>1.1</string>
 	<key>webaddress</key>
 	<string>https://github.com/drgrib/alfred-bear</string>
 </dict>

@@ -34,12 +34,16 @@ func main() {
 		}
 
 		if len(searchRows) > 0 {
-			for _, row := range searchRows[:createIndex] {
+			endIndex := createIndex
+			if len(searchRows) < createIndex {
+				endIndex = len(searchRows)
+			}
+			for _, row := range searchRows[:endIndex] {
 				alfred.Add(core.RowToItem(row))
 			}
 		}
 		alfred.Add(*createItem)
-		if len(searchRows) > 0 {
+		if len(searchRows) > createIndex {
 			for _, row := range searchRows[createIndex:] {
 				alfred.Add(core.RowToItem(row))
 			}
