@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	_ "github.com/mattn/go-sqlite3"
-	escape "github.com/tj/go-pg-escape"
 )
 
 const (
@@ -139,7 +138,7 @@ func NewBearDB() (LiteDB, error) {
 
 func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 	results := []map[string]string{}
-	rows, err := lite.db.Query(escape.Escape(q))
+	rows, err := lite.db.Query(q)
 	if err != nil {
 		return results, err
 	}
