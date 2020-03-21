@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"html"
 	"net/url"
 	"sort"
 	"strings"
@@ -70,7 +71,7 @@ func ParseQuery(arg string) Query {
 		}
 	}
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
-	query.WordString = strings.Join(words, " ")
+	query.WordString = html.EscapeString(strings.Join(words, " "))
 	return query
 }
 

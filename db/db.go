@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"html"
 	"os/user"
 	"path/filepath"
 
@@ -139,7 +138,7 @@ func NewBearDB() (LiteDB, error) {
 
 func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 	results := []map[string]string{}
-	rows, err := lite.db.Query(html.EscapeString(q))
+	rows, err := lite.db.Query(q)
 	if err != nil {
 		return results, err
 	}
