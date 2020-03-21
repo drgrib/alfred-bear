@@ -8,7 +8,6 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/drgrib/alfred"
-	escape "github.com/tj/go-pg-escape"
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/drgrib/alfred-bear/db"
@@ -56,6 +55,10 @@ type Query struct {
 	LastToken, WordString string
 }
 
+func escape(s string) string {
+	return strings.Replace(s, "'", "''", -1)
+}
+
 func ParseQuery(arg string) Query {
 	query := Query{}
 	query.Tokens = strings.Split(norm.NFC.String(arg), " ")
@@ -71,7 +74,7 @@ func ParseQuery(arg string) Query {
 		}
 	}
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
-	query.WordString = escape.Escape(strings.Join(words, " "))
+	query.WordString = escape(strings.Join(words, " "))
 	return query
 }
 
