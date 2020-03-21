@@ -96,7 +96,12 @@ func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 	return false, nil
 }
 
+func escape(s string) string {
+	return strings.Replace(s, "'", "''", -1)
+}
+
 func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
+	escapedWordString := escape(query.WordString)
 	switch {
 	case query.WordString == "" && len(query.Tags) == 0 && query.LastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
@@ -112,14 +117,14 @@ func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
 			tagConditions = append(tagConditions, c)
 		}
 		tagConjunction := strings.Join(tagConditions, " OR ")
-		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_TAGS_AND_QUERY, tagConjunction, query.WordString, query.WordString, len(query.Tags), query.WordString))
+		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_TAGS_AND_QUERY, tagConjunction, escapedWordString, escapedWordString, len(query.Tags), escapedWordString))
 		if err != nil {
 			return nil, err
 		}
 		return rows, nil
 
 	default:
-		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_QUERY, query.WordString, query.WordString, query.WordString))
+		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_QUERY, escapedWordString, escapedWordString, escapedWordString))
 		if err != nil {
 			return nil, err
 		}

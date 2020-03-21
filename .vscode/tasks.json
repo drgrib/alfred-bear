@@ -10,6 +10,7 @@
                 "go build search",
                 "go build link",
                 "go build create",
+                "go build setcursor",
             ],
             "group": {
                 "kind": "build",
@@ -71,6 +72,22 @@
                 "cwd": "${workspaceFolder}/cmd/create"
             },
             "command": "rm -f create; go build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "focus": true,
+                "echo": false
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "go build setcursor",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/setcursor"
+            },
+            "command": "rm -f setcursor; go build",
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
