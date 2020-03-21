@@ -67,6 +67,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>4D2DFA01-3886-42C0-82EE-5B0BE63B02D2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>4D5617AA-ADE7-45B5-9C05-DA6C69781662</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>4D5617AA-ADE7-45B5-9C05-DA6C69781662</key>
 		<array>
 			<dict>
@@ -716,6 +729,19 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>triggerid</key>
+				<string>search bear</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.external</string>
+			<key>uid</key>
+			<string>4D2DFA01-3886-42C0-82EE-5B0BE63B02D2</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
@@ -841,6 +867,13 @@
 			<integer>415</integer>
 			<key>ypos</key>
 			<integer>40</integer>
+		</dict>
+		<key>4D2DFA01-3886-42C0-82EE-5B0BE63B02D2</key>
+		<dict>
+			<key>xpos</key>
+			<integer>10</integer>
+			<key>ypos</key>
+			<integer>640</integer>
 		</dict>
 		<key>4D5617AA-ADE7-45B5-9C05-DA6C69781662</key>
 		<dict>
