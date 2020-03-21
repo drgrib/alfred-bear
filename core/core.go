@@ -55,10 +55,6 @@ type Query struct {
 	LastToken, WordString string
 }
 
-func escape(s string) string {
-	return strings.Replace(s, "'", "''", -1)
-}
-
 func ParseQuery(arg string) Query {
 	query := Query{}
 	query.Tokens = strings.Split(norm.NFC.String(arg), " ")
@@ -74,7 +70,7 @@ func ParseQuery(arg string) Query {
 		}
 	}
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
-	query.WordString = escape(strings.Join(words, " "))
+	query.WordString = strings.Join(words, " ")
 	return query
 }
 
