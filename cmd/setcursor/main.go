@@ -22,7 +22,7 @@ loop:
 			if application == "Bear" {
 				break loop
 			}
-			time.Sleep(250 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 	}
 
