@@ -38,37 +38,3 @@ loop:
 		panic(err)
 	}
 }
-
-/*
-timeoutChan := time.After(timoutDur)
-	i, err := WindowIndex(application, title)
-	hasNotOpenYetError := cantGetProcessError(err)
-	switch {
-	case hasNotOpenYetError:
-		isRunning, err := IsRunning(application)
-		if err != nil {
-			return -1, err
-		}
-		if isRunning {
-			Activate(application)
-		}
-	case err != nil && !hasNotOpenYetError:
-		return i, err
-	}
-
-	for i == -1 {
-		select {
-		case <-timeoutChan:
-			err = fmt.Errorf("Failed to find window %#v for %#v within %v",
-				title, application, timoutDur)
-			return -1, err
-		default:
-			i, err = WindowIndex(application, title)
-			hasNotOpenYetError := cantGetProcessError(err)
-			if err != nil && !hasNotOpenYetError {
-				return i, err
-			}
-			time.Sleep(250 * time.Millisecond)
-		}
-	}
-*/
