@@ -13,6 +13,25 @@ import (
 	"github.com/drgrib/alfred-bear/db"
 )
 
+var special = []string{
+	"@tagged",
+	"@untagged",
+	"@today",
+	"@yesterday",
+	"@lastXdays",
+	"@images",
+	"@files",
+	"@attachments",
+	"@task",
+	"@todo",
+	"@done",
+	"@code",
+	"@title",
+	"@locked",
+	"@date(",
+	"@cdate(",
+}
+
 func getUniqueTagString(tagString string) string {
 	if tagString == "" {
 		return ""
@@ -72,6 +91,53 @@ func ParseQuery(arg string) Query {
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
 	query.WordString = strings.Join(words, " ")
 	return query
+}
+
+func Autocomplete(litedb db.LiteDB, query Query) (bool, error) {
+	autocompleted, err := AutocompleteTags(litedb, query)
+	if err != nil {
+		return false, err
+	}
+	if autocompleted {
+		return autocompleted, nil
+	}
+
+	return AutocompleteSpecial(litedb, query)
+}
+
+func AutocompleteSpecial(litedb db.LiteDB, query Query) (bool, error) {
+	if strings.HasPrefix(query.LastToken, "@") {
+		for _, s := range special {
+			if strings.HasPrefix(s, query.LastToken) {
+				autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + s + " "
+				alfred.Add(alfred.Item{
+					Title:        s,
+					Autocomplete: strings.TrimLeft(autocomplete, " "),
+					Valid:        alfred.Bool(false),
+					UID:          s,
+				})
+			}
+		}
+		return true, nil
+	}
+
+	if strings.HasPrefix(query.LastToken, "-@") {
+		for _, s := range special {
+			if strings.HasPrefix(s, query.LastToken[1:]) {
+				s = "-" + s
+				autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + s + " "
+				alfred.Add(alfred.Item{
+					Title:        s,
+					Autocomplete: strings.TrimLeft(autocomplete, " "),
+					Valid:        alfred.Bool(false),
+					UID:          s,
+				})
+			}
+		}
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
@@ -156,6 +222,32 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 
 	item := alfred.Item{
 		Title: fmt.Sprintf("Create %#v", query.WordString),
+		Arg:   callbackString,
+		Valid: alfred.Bool(true),
+	}
+	if len(query.Tags) != 0 {
+		item.Subtitle = strings.Join(query.Tags, " ")
+	}
+	return &item, nil
+}
+
+func GetAppSearchItem(query Query) (*alfred.Item, error) {
+	callback := []string{}
+	if query.WordString != "" {
+		callback = append(callback, "term="+url.PathEscape(query.WordString))
+	}
+	if len(query.Tags) != 0 {
+		bareTags := []string{}
+		for _, t := range query.Tags {
+			bareTags = append(bareTags, url.PathEscape(t[1:]))
+		}
+		callback = append(callback, "tag="+strings.Join(bareTags, ","))
+	}
+
+	callbackString := strings.Join(callback, "&")
+
+	item := alfred.Item{
+		Title: fmt.Sprintf("Search for %#v in Bear App", query.WordString),
 		Arg:   callbackString,
 		Valid: alfred.Bool(true),
 	}
