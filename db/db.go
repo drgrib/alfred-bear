@@ -161,9 +161,9 @@ func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 		}
 		for i, colName := range cols {
 			val := columnPointers[i].(*interface{})
-			uints, ok := (*val).([]uint8)
+			s, ok := (*val).(string)
 			if ok {
-				m[colName] = string(uints)
+				m[colName] = s
 			} else {
 				m[colName] = ""
 			}
