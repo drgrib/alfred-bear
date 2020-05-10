@@ -13,6 +13,27 @@ import (
 	"github.com/drgrib/alfred-bear/db"
 )
 
+var special = []string{
+	"@tagged",
+	"@untagged",
+	"@today",
+	"@yesterday",
+	"@lastXdays",
+	"@images",
+	"@files",
+	"@attachments",
+	"@task",
+	"@todo",
+	"@done",
+	"@code",
+	"@title",
+	"@locked",
+	"@date(",
+	"@cdate(",
+}
+
+const argSplit = "|"
+
 func getUniqueTagString(tagString string) string {
 	if tagString == "" {
 		return ""
@@ -35,24 +56,37 @@ func getUniqueTagString(tagString string) string {
 	return "#" + strings.Join(uniqueTags, " #")
 }
 
-func RowToItem(row map[string]string) alfred.Item {
+func RowToItem(row map[string]string, query Query) alfred.Item {
+	searchCallbackString := getSearchCallbackString(query)
 	return alfred.Item{
 		Title:    row[db.TitleKey],
 		Subtitle: getUniqueTagString(row[db.TagsKey]),
-		Arg:      row[db.NoteIDKey],
-		Valid:    alfred.Bool(true),
+		Arg: strings.Join([]string{
+			row[db.NoteIDKey],
+			searchCallbackString,
+		},
+			argSplit,
+		),
+		Valid: alfred.Bool(true),
 	}
 }
 
-func AddNoteRowsToAlfred(rows []map[string]string) {
+func AddNoteRowsToAlfred(rows []map[string]string, query Query) {
 	for _, row := range rows {
-		alfred.Add(RowToItem(row))
+		item := RowToItem(row, query)
+		alfred.Add(item)
 	}
 }
 
 type Query struct {
-	Tokens, Tags          []string
-	LastToken, WordString string
+	Tokens     []string
+	Tags       []string
+	LastToken  string
+	WordString string
+}
+
+func (query Query) String() string {
+	return strings.Join(query.Tokens, " ")
 }
 
 func ParseQuery(arg string) Query {
@@ -72,6 +106,53 @@ func ParseQuery(arg string) Query {
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
 	query.WordString = strings.Join(words, " ")
 	return query
+}
+
+func Autocomplete(litedb db.LiteDB, query Query) (bool, error) {
+	autocompleted, err := AutocompleteTags(litedb, query)
+	if err != nil {
+		return false, err
+	}
+	if autocompleted {
+		return autocompleted, nil
+	}
+
+	return AutocompleteSpecial(litedb, query)
+}
+
+func AutocompleteSpecial(litedb db.LiteDB, query Query) (bool, error) {
+	if strings.HasPrefix(query.LastToken, "@") {
+		for _, s := range special {
+			if strings.HasPrefix(s, query.LastToken) {
+				autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + s + " "
+				alfred.Add(alfred.Item{
+					Title:        s,
+					Autocomplete: strings.TrimLeft(autocomplete, " "),
+					Valid:        alfred.Bool(false),
+					UID:          s,
+				})
+			}
+		}
+		return true, nil
+	}
+
+	if strings.HasPrefix(query.LastToken, "-@") {
+		for _, s := range special {
+			if strings.HasPrefix(s, query.LastToken[1:]) {
+				s = "-" + s
+				autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + s + " "
+				alfred.Add(alfred.Item{
+					Title:        s,
+					Autocomplete: strings.TrimLeft(autocomplete, " "),
+					Valid:        alfred.Bool(false),
+					UID:          s,
+				})
+			}
+		}
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
@@ -154,13 +235,51 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 	}
 	callbackString := strings.Join(callback, "&")
 
+	title := fmt.Sprintf("Create %q", query.WordString)
 	item := alfred.Item{
-		Title: fmt.Sprintf("Create %#v", query.WordString),
+		Title: title,
 		Arg:   callbackString,
 		Valid: alfred.Bool(true),
+		UID:   "create:" + title,
 	}
 	if len(query.Tags) != 0 {
 		item.Subtitle = strings.Join(query.Tags, " ")
+		item.UID += item.Subtitle
+	}
+	return &item, nil
+}
+
+func getSearchCallbackString(query Query) string {
+	callback := []string{}
+
+	if query.WordString != "" {
+		callback = append(callback, "term="+url.PathEscape(query.WordString))
+	}
+
+	if len(query.Tags) != 0 {
+		callback = append(callback, "tag="+query.Tags[0][1:])
+	}
+
+	return strings.Join(callback, "&")
+}
+
+func GetAppSearchItem(query Query) (*alfred.Item, error) {
+	title := "Search in Bear App"
+	if query.WordString != "" {
+		title = fmt.Sprintf("Search %#v in Bear App", query.WordString)
+	}
+
+	callbackString := getSearchCallbackString(query)
+
+	item := alfred.Item{
+		Title: title,
+		Arg:   callbackString,
+		Valid: alfred.Bool(true),
+		UID:   "appSearch:" + title,
+	}
+	if len(query.Tags) != 0 {
+		item.Subtitle = query.Tags[0]
+		item.UID += item.Subtitle
 	}
 	return &item, nil
 }

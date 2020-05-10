@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/drgrib/alfred"
 
@@ -17,7 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	autocompleted, err := core.AutocompleteTags(litedb, query)
+	autocompleted, err := core.Autocomplete(litedb, query)
 	if err != nil {
 		panic(err)
 	}
@@ -27,12 +28,20 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		core.AddNoteRowsToAlfred(rows)
+		core.AddNoteRowsToAlfred(rows, query)
 		if len(rows) == 0 {
-			alfred.Add(alfred.Item{
-				Title: "No matching items found",
-				Valid: alfred.Bool(false),
-			})
+			if strings.Contains(query.WordString, "@") {
+				mainWindowItem, err := core.GetAppSearchItem(query)
+				if err != nil {
+					panic(err)
+				}
+				alfred.Add(*mainWindowItem)
+			} else {
+				alfred.Add(alfred.Item{
+					Title: "No matching items found",
+					Valid: alfred.Bool(false),
+				})
+			}
 		}
 	}
 

@@ -2,7 +2,7 @@
 Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) using [Alfred](https://www.alfredapp.com/workflows/).
 
 ## Install
-Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.1/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.2/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 
 ## Search
 `bs` or `bsearch`
@@ -41,6 +41,19 @@ Start typing to search titles and text within a tag.
 All these terms can be typed in any order and they will work the same. For example, if you want to add a tag after typing a bare search term, the autocomplete will still help you. Or if you remember you want to filter by another tag after typing the first tag and a bare search term, you can autocomplete and add the second tag by typing `#` again.
 
 <img src="doc/TagAnyOrder.png" width="500">
+
+### Search in Bear App
+You can search any query you type in the Bear app's main window by holding down the option key. If you've entered a tag, it will open the Bear main window to that tag for further browsing. 
+
+<img src="doc/SearchQueryInBearApp.png" width="500">
+
+The workflow will also autocomplete any of Bear's [Special Search keywords](https://bear.app/faq/Advanced%20search%20options%20in%20Bear/) if you start typing `@` or `-@`.
+
+<img src="doc/SpecialSearchAutocomplete.png" width="500">
+
+If you use these options and have no other search results, the workflow will automatically populate a "Search ... in Bear App" item without you needing to press option.
+
+<img src="doc/SearchSpecialInBearApp.png" width="500">
 
 ### Link Pasting
 

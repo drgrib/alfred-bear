@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/drgrib/alfred"
 
@@ -18,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	autocompleted, err := core.AutocompleteTags(litedb, query)
+	autocompleted, err := core.Autocomplete(litedb, query)
 	if err != nil {
 		panic(err)
 	}
@@ -28,6 +29,12 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+
+		appSearchItem, err := core.GetAppSearchItem(query)
+		if err != nil {
+			panic(err)
+		}
+
 		createItem, err := core.GetCreateItem(query)
 		if err != nil {
 			panic(err)
@@ -39,13 +46,15 @@ func main() {
 				endIndex = len(searchRows)
 			}
 			for _, row := range searchRows[:endIndex] {
-				alfred.Add(core.RowToItem(row))
+				alfred.Add(core.RowToItem(row, query))
 			}
+		} else if strings.Contains(query.WordString, "@") {
+			alfred.Add(*appSearchItem)
 		}
 		alfred.Add(*createItem)
 		if len(searchRows) > createIndex {
 			for _, row := range searchRows[createIndex:] {
-				alfred.Add(core.RowToItem(row))
+				alfred.Add(core.RowToItem(row, query))
 			}
 		}
 	}
