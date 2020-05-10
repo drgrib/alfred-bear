@@ -28,7 +28,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		core.AddNoteRowsToAlfred(rows)
+		core.AddNoteRowsToAlfred(rows, query)
 		if len(rows) == 0 {
 			if strings.Contains(query.WordString, "@") {
 				mainWindowItem, err := core.GetAppSearchItem(query)

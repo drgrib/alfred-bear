@@ -32,6 +32,8 @@ var special = []string{
 	"@cdate(",
 }
 
+const argSplit = "|"
+
 func getUniqueTagString(tagString string) string {
 	if tagString == "" {
 		return ""
@@ -54,24 +56,36 @@ func getUniqueTagString(tagString string) string {
 	return "#" + strings.Join(uniqueTags, " #")
 }
 
-func RowToItem(row map[string]string) alfred.Item {
+func RowToItem(row map[string]string, query Query) alfred.Item {
+	searchCallbackString := getSearchCallbackString(query)
 	return alfred.Item{
 		Title:    row[db.TitleKey],
 		Subtitle: getUniqueTagString(row[db.TagsKey]),
-		Arg:      row[db.NoteIDKey],
-		Valid:    alfred.Bool(true),
+		Arg: strings.Join([]string{
+			row[db.NoteIDKey],
+			searchCallbackString,
+		},
+			argSplit),
+		Valid: alfred.Bool(true),
 	}
 }
 
-func AddNoteRowsToAlfred(rows []map[string]string) {
+func AddNoteRowsToAlfred(rows []map[string]string, query Query) {
 	for _, row := range rows {
-		alfred.Add(RowToItem(row))
+		item := RowToItem(row, query)
+		alfred.Add(item)
 	}
 }
 
 type Query struct {
-	Tokens, Tags          []string
-	LastToken, WordString string
+	Tokens     []string
+	Tags       []string
+	LastToken  string
+	WordString string
+}
+
+func (query Query) String() string {
+	return strings.Join(query.Tokens, " ")
 }
 
 func ParseQuery(arg string) Query {
@@ -220,39 +234,51 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 	}
 	callbackString := strings.Join(callback, "&")
 
+	title := fmt.Sprintf("Create %q", query.WordString)
 	item := alfred.Item{
-		Title: fmt.Sprintf("Create %#v", query.WordString),
+		Title: title,
 		Arg:   callbackString,
 		Valid: alfred.Bool(true),
+		UID:   "create:" + title,
 	}
 	if len(query.Tags) != 0 {
 		item.Subtitle = strings.Join(query.Tags, " ")
+		item.UID += item.Subtitle
 	}
 	return &item, nil
 }
 
-func GetAppSearchItem(query Query) (*alfred.Item, error) {
+func getSearchCallbackString(query Query) string {
 	callback := []string{}
+
 	if query.WordString != "" {
 		callback = append(callback, "term="+url.PathEscape(query.WordString))
 	}
+
 	if len(query.Tags) != 0 {
-		bareTags := []string{}
-		for _, t := range query.Tags {
-			bareTags = append(bareTags, url.PathEscape(t[1:]))
-		}
-		callback = append(callback, "tag="+strings.Join(bareTags, ","))
+		callback = append(callback, "tag="+query.Tags[0][1:])
 	}
 
-	callbackString := strings.Join(callback, "&")
+	return strings.Join(callback, "&")
+}
+
+func GetAppSearchItem(query Query) (*alfred.Item, error) {
+	title := "Search in Bear App"
+	if query.WordString != "" {
+		title = fmt.Sprintf("Search %#v in Bear App", query.WordString)
+	}
+
+	callbackString := getSearchCallbackString(query)
 
 	item := alfred.Item{
-		Title: fmt.Sprintf("Search for %#v in Bear App", query.WordString),
+		Title: title,
 		Arg:   callbackString,
 		Valid: alfred.Bool(true),
+		UID:   "appSearch:" + title,
 	}
 	if len(query.Tags) != 0 {
-		item.Subtitle = strings.Join(query.Tags, " ")
+		item.Subtitle = query.Tags[0]
+		item.UID += item.Subtitle
 	}
 	return &item, nil
 }

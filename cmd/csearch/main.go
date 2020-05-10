@@ -29,6 +29,12 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+
+		appSearchItem, err := core.GetAppSearchItem(query)
+		if err != nil {
+			panic(err)
+		}
+
 		createItem, err := core.GetCreateItem(query)
 		if err != nil {
 			panic(err)
@@ -40,19 +46,15 @@ func main() {
 				endIndex = len(searchRows)
 			}
 			for _, row := range searchRows[:endIndex] {
-				alfred.Add(core.RowToItem(row))
+				alfred.Add(core.RowToItem(row, query))
 			}
 		} else if strings.Contains(query.WordString, "@") {
-			appSearchItem, err := core.GetAppSearchItem(query)
-			if err != nil {
-				panic(err)
-			}
 			alfred.Add(*appSearchItem)
 		}
 		alfred.Add(*createItem)
 		if len(searchRows) > createIndex {
 			for _, row := range searchRows[createIndex:] {
-				alfred.Add(core.RowToItem(row))
+				alfred.Add(core.RowToItem(row, query))
 			}
 		}
 	}
