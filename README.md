@@ -42,6 +42,19 @@ All these terms can be typed in any order and they will work the same. For examp
 
 <img src="doc/TagAnyOrder.png" width="500">
 
+### Search in Bear App
+You can search any query you type in the Bear app's main window by holding down the option key. If you've entered a tag, it will open the Bear main window to that tag for further browsing. 
+
+<img src="doc/SearchQueryInBearApp.png" width="500">
+
+The workflow will also autocomplete any of Bear's [Special Search keywords](https://bear.app/faq/Advanced%20search%20options%20in%20Bear/) if you start typing `@` or `-@`.
+
+<img src="doc/SpecialSearchAutocomplete.png" width="500">
+
+If you use these options and have no other search results, the workflow will automatically populate a "Search ... in Bear App" item without you needing to press option.
+
+<img src="doc/SearchSpecialInBearApp.png" width="500">
+
 ### Link Pasting
 
 While in your Bear notes, you can paste a link to another note by searching for it and holding down the command key.

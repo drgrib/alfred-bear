@@ -65,7 +65,8 @@ func RowToItem(row map[string]string, query Query) alfred.Item {
 			row[db.NoteIDKey],
 			searchCallbackString,
 		},
-			argSplit),
+			argSplit,
+		),
 		Valid: alfred.Bool(true),
 	}
 }
