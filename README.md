@@ -51,7 +51,7 @@ The workflow will also autocomplete any of Bear's [Special Search keywords](http
 
 <img src="doc/SpecialSearchAutocomplete.png" width="500">
 
-If you use these options and have no other search results, the workflow will automatically populate a "Search ... in Bear App" item without you needing to press option.
+If you use these keywords and have no other search results, the workflow will automatically populate a "Search ... in Bear App" item without you needing to press option.
 
 <img src="doc/SearchSpecialInBearApp.png" width="500">
 
