@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"golang.org/x/text/unicode/norm"
 
@@ -23,6 +24,8 @@ func main() {
 		panic(err)
 	}
 	title := rows[0][db.TitleKey]
+	title = strings.ReplaceAll(title, "[", "- ")
+	title = strings.ReplaceAll(title, "]", " -")
 	link := fmt.Sprintf("[%s](%s)", title, callback)
 
 	fmt.Print(link)
