@@ -240,11 +240,9 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 		Title: title,
 		Arg:   callbackString,
 		Valid: alfred.Bool(true),
-		UID:   "create:" + title,
 	}
 	if len(query.Tags) != 0 {
 		item.Subtitle = strings.Join(query.Tags, " ")
-		item.UID += item.Subtitle
 	}
 	return &item, nil
 }
@@ -275,11 +273,9 @@ func GetAppSearchItem(query Query) (*alfred.Item, error) {
 		Title: title,
 		Arg:   callbackString,
 		Valid: alfred.Bool(true),
-		UID:   "appSearch:" + title,
 	}
 	if len(query.Tags) != 0 {
 		item.Subtitle = query.Tags[0]
-		item.UID += item.Subtitle
 	}
 	return &item, nil
 }
