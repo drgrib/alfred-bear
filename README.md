@@ -2,7 +2,7 @@
 Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) using [Alfred](https://www.alfredapp.com/workflows/).
 
 ## Install
-Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.3/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 
 ## Search
 `bs` or `bsearch`
@@ -43,7 +43,7 @@ All these terms can be typed in any order and they will work the same. For examp
 <img src="doc/TagAnyOrder.png" width="500">
 
 ### Search in Bear App
-You can search any _query_ you type in the Bear app's main window by holding down the shift key. If you've entered a tag, it will open the Bear main window to that tag for further browsing. 
+You can search any _query_ you type in the Bear app's main window by holding down the option key. If you've entered a tag, it will open the Bear main window to that tag for further browsing. 
 
 <img src="doc/SearchQueryInBearApp.png" width="500">
 
@@ -56,11 +56,11 @@ If you use these keywords and have no other search results, the workflow will au
 <img src="doc/SearchSpecialInBearApp.png" width="500">
 
 ### Open Note in Bear App
-Similarly, you can open any _note_ you select in the Bear app's main window by holding down the option key.
+Similarly, you can open any _note_ you select in the Bear app's main window by holding down the command key.
 
 ### Link Pasting
 
-While in your Bear notes, you can paste a link to another note by searching for it and holding down the command key.
+While in your Bear notes, you can paste a link to another note by searching for it and holding down the shift key.
 
 <img src="doc/Link1.png" width="500">
 <img src="doc/Link2.png" width="500">
@@ -83,7 +83,7 @@ If there are less than two search items, the create item will be the last or onl
 
 <img src="doc/CreateSearch2.png" width="500">
 
-You can additionally create links to notes by holding the command key while selecting a search item. Selecting the create item while holding the command key will do nothing.
+You can additionally create links to notes by holding the shift key while selecting a search item. Selecting the create item while holding the shift key will do nothing.
 
 ## Why I created this
 I am especially grateful to Chris Brown, who created a [Python based Bear workflow](https://github.com/chrisbro/alfred-bear). It was the basis for this project. However, I decided to create my own project for a few reasons:
