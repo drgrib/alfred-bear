@@ -2,7 +2,7 @@
 Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) using [Alfred](https://www.alfredapp.com/workflows/).
 
 ## Install
-Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.2/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.3/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 
 ## Search
 `bs` or `bsearch`
@@ -43,7 +43,7 @@ All these terms can be typed in any order and they will work the same. For examp
 <img src="doc/TagAnyOrder.png" width="500">
 
 ### Search in Bear App
-You can search any query you type in the Bear app's main window by holding down the option key. If you've entered a tag, it will open the Bear main window to that tag for further browsing. 
+You can search any _query_ you type in the Bear app's main window by holding down the shift key. If you've entered a tag, it will open the Bear main window to that tag for further browsing. 
 
 <img src="doc/SearchQueryInBearApp.png" width="500">
 
@@ -54,6 +54,9 @@ The workflow will also autocomplete any of Bear's [Special Search keywords](http
 If you use these keywords and have no other search results, the workflow will automatically populate a "Search ... in Bear App" item without you needing to press option.
 
 <img src="doc/SearchSpecialInBearApp.png" width="500">
+
+### Open Note in Bear App
+Similarly, you can open any _note_ you select in the Bear app's main window by holding down the option key.
 
 ### Link Pasting
 
