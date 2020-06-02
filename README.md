@@ -4,16 +4,6 @@ Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) 
 ## Install
 Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 
-### Authorize
-
-<img src="doc/Authorize.png" width="400">
-
-The first time you use the workflow after installing or upgrading, you will see a security warning. This is a quirk of macOS 10.15 and above. Apple currently forces developers to pay $99 a year to be able to officially sign their executables and avoid this warning, which I'm not going to pay since I'm providing this workflow for free as an open source project.
-
-After seeing this warning, you have to go to **System Preferences > Security & Privacy > General** and click the new button that has appeared to allow the executable to run. You then have to run it again and you will see this security warning *again* but now it will have a new button that lets you allow the executable to run.
-
-These warnings will appear once for each of the 5 executable inside the workflow as you use new features. Once you have authorized all 5, you won't see these warnings anymore until you install a new version.
-
 ## Search
 `bs` or `bsearch`
 
@@ -101,3 +91,13 @@ I am especially grateful to Chris Brown, who created a [Python based Bear workfl
 - Compiled Go is faster than interpretted Python. Not that much faster but fast enough for me to notice when searching and creating notes throughout the day.
 - I wanted the features involving tag searching and autocompletion, link pasting, and automatic clipboard note content.
 - I wanted fewer, more optimized SQL queries into the Bear database to increase speed since this appears to be the main bottleneck on performance.
+
+## Authorization
+
+<img src="doc/Authorize.png" width="400">
+
+The first time you use the workflow after installing or upgrading, you will see a security warning. This is a quirk of macOS 10.15 and above. Apple currently forces developers to pay $99 a year to be able to officially sign their executables and avoid this warning, which I'm not going to pay since I'm providing this workflow for free as an open source project.
+
+After seeing this warning, you have to go to **System Preferences > Security & Privacy > General** and click the new button that has appeared to allow the executable to run. You then have to run it again and you will see this security warning *again* but now it will have a new button that lets you allow the executable to run.
+
+These warnings will appear once for each of the 5 executable inside the workflow as you use new features. Once you have authorized all 5, you won't see these warnings anymore until you install a new version.
