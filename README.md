@@ -7,9 +7,9 @@ Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.4/Be
 ### Authorize
 The first time you use the workflow after installing or upgrading, you will see a security warning. This is a quirk of macOS 10.15 and above. Apple currently forces developers to pay $99 a year to be able to officially sign their executables and avoid this error, which I'm not going to pay since I'm providing this workflow for free as an open source project.
 
-After seeing this error, you have to go to **System Preferences > Security & Privacy > General** and click the new button that has appeared to allow the executable to run. You then have to run it again and you will see this error message *again* but now it will have a new button that lets you allow the executable to run.
+After seeing this error, you have to go to **System Preferences > Security & Privacy > General** and click the new button that has appeared to allow the executable to run. You then have to run it again and you will see this security warning *again* but now it will have a new button that lets you allow the executable to run.
 
-These errors will appear once for each of the 5 executable inside the workflow as you use new features. Once you have authorized all 5, you won't see these errors anymore until you install a new version.
+These warnings will appear once for each of the 5 executable inside the workflow as you use new features. Once you have authorized all 5, you won't see these warnings anymore until you install a new version.
 
 ## Search
 `bs` or `bsearch`
