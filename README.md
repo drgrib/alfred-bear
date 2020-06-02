@@ -6,7 +6,7 @@ Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.4/Be
 
 ### Authorize
 
-<img src="doc/SearchSpecialInBearApp.png" width="400">
+<img src="doc/Authorize.png" width="400">
 
 The first time you use the workflow after installing or upgrading, you will see a security warning. This is a quirk of macOS 10.15 and above. Apple currently forces developers to pay $99 a year to be able to officially sign their executables and avoid this error, which I'm not going to pay since I'm providing this workflow for free as an open source project.
 
