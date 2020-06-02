@@ -5,7 +5,7 @@ Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) 
 Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 
 ### Authorize
-The first time you use the workflow after installing or upgrading, you will see an error. This is a quirk of macOS 10.15 and above. Apple currently forces developers to pay $99 a year to be able to officially sign their executables and avoid this error, which I'm not going to pay since I'm providing this workflow for free as an open source project.
+The first time you use the workflow after installing or upgrading, you will see a security warning. This is a quirk of macOS 10.15 and above. Apple currently forces developers to pay $99 a year to be able to officially sign their executables and avoid this error, which I'm not going to pay since I'm providing this workflow for free as an open source project.
 
 After seeing this error, you have to go to **System Preferences > Security & Privacy > General** and click the new button that has appeared to allow the program to run. You then have to run it again and you will see this error message *again* but now it will have a new button that lets you allow the executable to run.
 
