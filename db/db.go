@@ -51,7 +51,7 @@ WHERE
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 100
+LIMIT 200
 `
 
 	NOTES_BY_TAGS_AND_QUERY = `
@@ -81,7 +81,7 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 )
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 100
+LIMIT 200
 `
 
 	TAGS_BY_TITLE = `
