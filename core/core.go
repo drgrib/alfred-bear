@@ -56,7 +56,7 @@ func getUniqueTagString(tagString string) string {
 	return "#" + strings.Join(uniqueTags, " #")
 }
 
-func RowToItem(row map[string]string, query Query) alfred.Item {
+func RowToItem(row db.Note, query Query) alfred.Item {
 	searchCallbackString := getSearchCallbackString(query)
 	return alfred.Item{
 		Title:    row[db.TitleKey],
@@ -71,7 +71,7 @@ func RowToItem(row map[string]string, query Query) alfred.Item {
 	}
 }
 
-func AddNoteRowsToAlfred(rows []map[string]string, query Query) {
+func AddNoteRowsToAlfred(rows []db.Note, query Query) {
 	for _, row := range rows {
 		item := RowToItem(row, query)
 		alfred.Add(item)
@@ -181,8 +181,7 @@ func escape(s string) string {
 	return strings.Replace(s, "'", "''", -1)
 }
 
-func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
-	escapedWordString := escape(query.WordString)
+func GetSearchRows(litedb db.LiteDB, query Query) ([]db.Note, error) {
 	switch {
 	case query.WordString == "" && len(query.Tags) == 0 && query.LastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
@@ -192,20 +191,14 @@ func GetSearchRows(litedb db.LiteDB, query Query) ([]map[string]string, error) {
 		return rows, nil
 
 	case len(query.Tags) != 0:
-		tagConditions := []string{}
-		for _, t := range query.Tags {
-			c := fmt.Sprintf("lower(tag.ZTITLE) = lower('%s')", t[1:])
-			tagConditions = append(tagConditions, c)
-		}
-		tagConjunction := strings.Join(tagConditions, " OR ")
-		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_TAGS_AND_QUERY, tagConjunction, escapedWordString, escapedWordString, len(query.Tags), escapedWordString))
+		rows, err := litedb.QueryNotesByTextAndTags(query.WordString, query.Tags)
 		if err != nil {
 			return nil, err
 		}
 		return rows, nil
 
 	default:
-		rows, err := litedb.Query(fmt.Sprintf(db.NOTES_BY_QUERY, escapedWordString, escapedWordString, escapedWordString))
+		rows, err := litedb.QueryNotesByText(query.WordString)
 		if err != nil {
 			return nil, err
 		}
