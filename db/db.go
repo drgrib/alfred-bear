@@ -50,7 +50,7 @@ WHERE
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 25
+LIMIT 100
 `
 
 	NOTES_BY_TAGS_AND_QUERY = `
@@ -80,7 +80,7 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 )
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 25
+LIMIT 100
 `
 
 	TAGS_BY_TITLE = `
@@ -274,15 +274,12 @@ func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note
 		}
 	}
 
-	finalRecords := noteRecords
-
-	// // experimental strict filter
-	// var finalRecords []*noteRecord
-	// for _, record := range noteRecords {
-	// 	if count[record.note[NoteIDKey]] == len(words) || record.containsWords {
-	// 		finalRecords = append(finalRecords, record)
-	// 	}
-	// }
+	var finalRecords []*noteRecord
+	for _, record := range noteRecords {
+		if count[record.note[NoteIDKey]] == len(words) || record.containsWords {
+			finalRecords = append(finalRecords, record)
+		}
+	}
 
 	sort.Slice(finalRecords, func(i, j int) bool {
 		iRecord := finalRecords[i]
