@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -252,9 +253,23 @@ func (litedb LiteDB) QueryNotesByText(text string) ([]Note, error) {
 	return multiWordQuery(text, wordQuery)
 }
 
+func splitSpacesOrQuoted(s string) []string {
+	r := regexp.MustCompile(`([^\s"']+)|"([^"]*)"`)
+	matches := r.FindAllStringSubmatch(s, -1)
+	var split []string
+	for _, v := range matches {
+		match := v[1]
+		if match == "" {
+			match = v[2]
+		}
+		split = append(split, match)
+	}
+	return split
+}
+
 func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note, error) {
 	lowerText := strings.ToLower(text)
-	words := strings.Split(lowerText, " ")
+	words := splitSpacesOrQuoted(lowerText)
 	var noteRecords []*noteRecord
 	count := map[string]int{}
 	for _, word := range words {
