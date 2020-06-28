@@ -51,7 +51,7 @@ WHERE
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 200
+LIMIT 400
 `
 
 	NOTES_BY_TAGS_AND_QUERY = `
@@ -81,7 +81,7 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 )
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 200
+LIMIT 400
 `
 
 	TAGS_BY_TITLE = `
@@ -271,7 +271,21 @@ func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note
 	lowerText := strings.ToLower(text)
 	words := splitSpacesOrQuoted(lowerText)
 
-	var noteRecords []*noteRecord
+	var records []*noteRecord
+	fullMatch := map[string]bool{}
+	notes, err := wordQuery(lowerText)
+	if err != nil {
+		return nil, err
+	}
+	for i, note := range notes {
+		noteId := note[NoteIDKey]
+		record := NewNoteRecord(i, note, lowerText)
+		record.originalIndex = i
+		records = append(records, record)
+		fullMatch[noteId] = true
+	}
+
+	var multiRecords []*noteRecord
 	count := map[string]int{}
 	for _, word := range words {
 		notes, err := wordQuery(word)
@@ -281,25 +295,24 @@ func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note
 
 		for i, note := range notes {
 			noteId := note[NoteIDKey]
-			if count[noteId] == 0 {
+			if count[noteId] == 0 && !fullMatch[noteId] {
 				record := NewNoteRecord(i, note, lowerText)
 				record.originalIndex = i
-				noteRecords = append(noteRecords, record)
+				multiRecords = append(multiRecords, record)
 			}
 			count[noteId]++
 		}
 	}
 
-	var finalRecords []*noteRecord
-	for _, record := range noteRecords {
+	for _, record := range multiRecords {
 		if count[record.note[NoteIDKey]] == len(words) || record.containsWords {
-			finalRecords = append(finalRecords, record)
+			records = append(records, record)
 		}
 	}
 
-	sort.Slice(finalRecords, func(i, j int) bool {
-		iRecord := finalRecords[i]
-		jRecord := finalRecords[j]
+	sort.Slice(records, func(i, j int) bool {
+		iRecord := records[i]
+		jRecord := records[j]
 
 		if iRecord.contains != jRecord.contains {
 			return iRecord.contains
@@ -317,7 +330,7 @@ func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note
 	})
 
 	var finalRows []Note
-	for _, noteRecord := range finalRecords {
+	for _, noteRecord := range records {
 		finalRows = append(finalRows, noteRecord.note)
 	}
 
