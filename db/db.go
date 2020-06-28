@@ -2,8 +2,12 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"os/user"
 	"path/filepath"
+	"regexp"
+	"sort"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -47,7 +51,7 @@ WHERE
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 25
+LIMIT 400
 `
 
 	NOTES_BY_TAGS_AND_QUERY = `
@@ -77,7 +81,7 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 )
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 25
+LIMIT 400
 `
 
 	TAGS_BY_TITLE = `
@@ -111,6 +115,8 @@ LIMIT 25
 `
 )
 
+type Note map[string]string
+
 func Expanduser(path string) string {
 	usr, _ := user.Current()
 	dir := usr.HomeDir
@@ -136,9 +142,9 @@ func NewBearDB() (LiteDB, error) {
 	return litedb, err
 }
 
-func (lite LiteDB) Query(q string) ([]map[string]string, error) {
-	results := []map[string]string{}
-	rows, err := lite.db.Query(q)
+func (litedb LiteDB) Query(q string) ([]Note, error) {
+	results := []Note{}
+	rows, err := litedb.db.Query(q)
 	if err != nil {
 		return results, err
 	}
@@ -150,7 +156,7 @@ func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 	}
 
 	for rows.Next() {
-		m := map[string]string{}
+		m := Note{}
 		columns := make([]interface{}, len(cols))
 		columnPointers := make([]interface{}, len(cols))
 		for i := range columns {
@@ -171,4 +177,162 @@ func (lite LiteDB) Query(q string) ([]map[string]string, error) {
 		results = append(results, m)
 	}
 	return results, err
+}
+
+func escape(s string) string {
+	return strings.Replace(s, "'", "''", -1)
+}
+
+func containsOrderedWords(text string, words []string) bool {
+	prev := 0
+	for _, w := range words {
+		i := strings.Index(text, w)
+		if i == -1 || i < prev {
+			return false
+		}
+		prev = i
+	}
+	return true
+}
+
+func containsWords(text string, words []string) bool {
+	for _, w := range words {
+		if !strings.Contains(text, w) {
+			return false
+		}
+	}
+	return true
+}
+
+func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction string, tags []string) ([]Note, error) {
+	text = escape(text)
+	return litedb.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, text, text, len(tags), text))
+}
+
+func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note, error) {
+	tagConditions := []string{}
+	for _, t := range tags {
+		c := fmt.Sprintf("lower(tag.ZTITLE) = lower('%s')", t[1:])
+		tagConditions = append(tagConditions, c)
+	}
+	tagConjunction := strings.Join(tagConditions, " OR ")
+
+	wordQuery := func(word string) ([]Note, error) {
+		return litedb.queryNotesByTextAndTagConjunction(word, tagConjunction, tags)
+	}
+
+	return multiWordQuery(text, wordQuery)
+}
+
+func (litedb LiteDB) QueryNotesByText(text string) ([]Note, error) {
+	wordQuery := func(word string) ([]Note, error) {
+		word = escape(word)
+		return litedb.Query(fmt.Sprintf(NOTES_BY_QUERY, word, word, word))
+	}
+	return multiWordQuery(text, wordQuery)
+}
+
+func splitSpacesOrQuoted(s string) []string {
+	r := regexp.MustCompile(`([^\s"']+)|"([^"]*)"`)
+	matches := r.FindAllStringSubmatch(s, -1)
+	var split []string
+	for _, v := range matches {
+		match := v[1]
+		if match == "" {
+			match = v[2]
+		}
+		split = append(split, match)
+	}
+	return split
+}
+
+type noteRecord struct {
+	note                 Note
+	contains             bool
+	containsOrderedWords bool
+	containsWords        bool
+	originalIndex        int
+}
+
+func NewNoteRecord(i int, note Note, lowerText string) *noteRecord {
+	title := strings.ToLower(note[TitleKey])
+	words := strings.Split(lowerText, " ")
+	record := noteRecord{
+		originalIndex:        i,
+		note:                 note,
+		contains:             strings.Contains(title, lowerText),
+		containsOrderedWords: containsOrderedWords(title, words),
+		containsWords:        containsWords(title, words),
+	}
+	return &record
+}
+
+func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note, error) {
+	lowerText := strings.ToLower(text)
+	words := splitSpacesOrQuoted(lowerText)
+
+	var records []*noteRecord
+	fullMatch := map[string]bool{}
+	notes, err := wordQuery(lowerText)
+	if err != nil {
+		return nil, err
+	}
+	for i, note := range notes {
+		noteId := note[NoteIDKey]
+		record := NewNoteRecord(i, note, lowerText)
+		record.originalIndex = i
+		records = append(records, record)
+		fullMatch[noteId] = true
+	}
+
+	var multiRecords []*noteRecord
+	count := map[string]int{}
+	for _, word := range words {
+		notes, err := wordQuery(word)
+		if err != nil {
+			return nil, err
+		}
+
+		for i, note := range notes {
+			noteId := note[NoteIDKey]
+			if count[noteId] == 0 && !fullMatch[noteId] {
+				record := NewNoteRecord(i, note, lowerText)
+				record.originalIndex = i
+				multiRecords = append(multiRecords, record)
+			}
+			count[noteId]++
+		}
+	}
+
+	for _, record := range multiRecords {
+		if count[record.note[NoteIDKey]] == len(words) || record.containsWords {
+			records = append(records, record)
+		}
+	}
+
+	sort.Slice(records, func(i, j int) bool {
+		iRecord := records[i]
+		jRecord := records[j]
+
+		if iRecord.contains != jRecord.contains {
+			return iRecord.contains
+		}
+
+		if iRecord.containsOrderedWords != jRecord.containsOrderedWords {
+			return iRecord.containsOrderedWords
+		}
+
+		if iRecord.containsWords != jRecord.containsWords {
+			return iRecord.containsWords
+		}
+
+		return iRecord.originalIndex < jRecord.originalIndex
+	})
+
+	var finalRows []Note
+	for _, noteRecord := range records {
+		finalRows = append(finalRows, noteRecord.note)
+	}
+
+	return finalRows, nil
 }
