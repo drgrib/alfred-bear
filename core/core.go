@@ -229,6 +229,9 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 	callbackString := strings.Join(callback, "&")
 
 	title := fmt.Sprintf("Create %q", query.WordString)
+	if strings.Contains(title, `\"`) {
+		title = fmt.Sprintf("Create '%s'", query.WordString)
+	}
 	item := alfred.Item{
 		Title: title,
 		Arg:   callbackString,

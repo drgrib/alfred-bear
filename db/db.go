@@ -204,27 +204,6 @@ func containsWords(text string, words []string) bool {
 	return true
 }
 
-type noteRecord struct {
-	note                 Note
-	contains             bool
-	containsOrderedWords bool
-	containsWords        bool
-	originalIndex        int
-}
-
-func NewNoteRecord(i int, note Note, lowerText string) *noteRecord {
-	title := strings.ToLower(note[TitleKey])
-	words := strings.Split(lowerText, " ")
-	record := noteRecord{
-		originalIndex:        i,
-		note:                 note,
-		contains:             strings.Contains(title, lowerText),
-		containsOrderedWords: containsOrderedWords(title, words),
-		containsWords:        containsWords(title, words),
-	}
-	return &record
-}
-
 func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction string, tags []string) ([]Note, error) {
 	text = escape(text)
 	return litedb.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, text, text, len(tags), text))
@@ -267,9 +246,31 @@ func splitSpacesOrQuoted(s string) []string {
 	return split
 }
 
+type noteRecord struct {
+	note                 Note
+	contains             bool
+	containsOrderedWords bool
+	containsWords        bool
+	originalIndex        int
+}
+
+func NewNoteRecord(i int, note Note, lowerText string) *noteRecord {
+	title := strings.ToLower(note[TitleKey])
+	words := strings.Split(lowerText, " ")
+	record := noteRecord{
+		originalIndex:        i,
+		note:                 note,
+		contains:             strings.Contains(title, lowerText),
+		containsOrderedWords: containsOrderedWords(title, words),
+		containsWords:        containsWords(title, words),
+	}
+	return &record
+}
+
 func multiWordQuery(text string, wordQuery func(string) ([]Note, error)) ([]Note, error) {
 	lowerText := strings.ToLower(text)
 	words := splitSpacesOrQuoted(lowerText)
+
 	var noteRecords []*noteRecord
 	count := map[string]int{}
 	for _, word := range words {
