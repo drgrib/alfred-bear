@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-sqlite3"
 )
 
 const (
@@ -46,11 +46,11 @@ WHERE
 	note.ZARCHIVED=0
 	AND note.ZTRASHED=0
 	AND (
-		lower(note.ZTITLE) LIKE lower('%%%s%%') OR
-		lower(note.ZTEXT) LIKE lower('%%%s%%')
+		utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
+		utflower(note.ZTEXT) LIKE utflower('%%%s%%')
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
+ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
 LIMIT 400
 `
 
@@ -73,14 +73,14 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 		AND note.ZTRASHED=0
 		AND (%s)
 		AND (
-			lower(note.ZTITLE) LIKE lower('%%%s%%') OR
-			lower(note.ZTEXT) LIKE lower('%%%s%%')
+			utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
+			utflower(note.ZTEXT) LIKE utflower('%%%s%%')
 		)
 	GROUP BY note.ZUNIQUEIDENTIFIER
 	HAVING COUNT(*) >= %d
 )
 GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY case when lower(note.ZTITLE) LIKE lower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
+ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
 LIMIT 400
 `
 
@@ -94,7 +94,7 @@ FROM
 WHERE
 	n.ZARCHIVED=0
 	AND n.ZTRASHED=0
-	AND lower(t.ZTITLE) LIKE lower('%%%s%%')
+	AND utflower(t.ZTITLE) LIKE utflower('%%%s%%')
 ORDER BY
 	t.ZMODIFICATIONDATE DESC
 LIMIT 25
@@ -131,9 +131,19 @@ type LiteDB struct {
 }
 
 func NewLiteDB(path string) (LiteDB, error) {
-	db, err := sql.Open("sqlite3", path)
+	sql.Register("sqlite3_custom", &sqlite3.SQLiteDriver{
+		ConnectHook: func(conn *sqlite3.SQLiteConn) error {
+			return conn.RegisterFunc("utflower", utfLower, true)
+		},
+	})
+
+	db, err := sql.Open("sqlite3_custom", path)
 	litedb := LiteDB{db}
 	return litedb, err
+}
+
+func utfLower(s string) string {
+	return strings.ToLower(s)
 }
 
 func NewBearDB() (LiteDB, error) {
@@ -212,7 +222,7 @@ func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction stri
 func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note, error) {
 	tagConditions := []string{}
 	for _, t := range tags {
-		c := fmt.Sprintf("lower(tag.ZTITLE) = lower('%s')", t[1:])
+		c := fmt.Sprintf("utflower(tag.ZTITLE) = utflower('%s')", t[1:])
 		tagConditions = append(tagConditions, c)
 	}
 	tagConjunction := strings.Join(tagConditions, " OR ")
