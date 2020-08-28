@@ -47,7 +47,7 @@ WHERE
 	AND note.ZTRASHED=0
 	AND (
 		utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-		utflower(note.ZTEXT) LIKE utflower('%%%s%%')
+		lower(note.ZTEXT) LIKE utflower('%%%s%%')
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
@@ -74,7 +74,7 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 		AND (%s)
 		AND (
 			utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-			utflower(note.ZTEXT) LIKE utflower('%%%s%%')
+			lower(note.ZTEXT) LIKE utflower('%%%s%%')
 		)
 	GROUP BY note.ZUNIQUEIDENTIFIER
 	HAVING COUNT(*) >= %d
