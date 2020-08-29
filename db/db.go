@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/mattn/go-sqlite3"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -45,9 +46,10 @@ FROM
 WHERE
 	note.ZARCHIVED=0
 	AND note.ZTRASHED=0
+	AND note.ZTEXT IS NOT NULL
 	AND (
 		utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
-		lower(note.ZTEXT) LIKE utflower('%'||$1||'%')
+		utflower(note.ZTEXT) LIKE utflower('%'||$1||'%')
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
@@ -71,10 +73,11 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 	WHERE
 		note.ZARCHIVED=0
 		AND note.ZTRASHED=0
+		AND note.ZTEXT IS NOT NULL
 		AND (%s)
 		AND (
 			utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-			lower(note.ZTEXT) LIKE utflower('%%%s%%')
+			utflower(note.ZTEXT) LIKE utflower('%%%s%%')
 		)
 	GROUP BY note.ZUNIQUEIDENTIFIER
 	HAVING COUNT(*) >= %d
@@ -156,13 +159,12 @@ func (litedb LiteDB) Query(q string, args ...interface{}) ([]Note, error) {
 	results := []Note{}
 	rows, err := litedb.db.Query(q, args...)
 	if err != nil {
-		return results, err
+		return results, errors.WithStack(err)
 	}
-	defer rows.Close()
 
 	cols, err := rows.Columns()
 	if err != nil {
-		return results, err
+		return results, errors.WithStack(err)
 	}
 
 	for rows.Next() {
@@ -173,7 +175,7 @@ func (litedb LiteDB) Query(q string, args ...interface{}) ([]Note, error) {
 			columnPointers[i] = &columns[i]
 		}
 		if err := rows.Scan(columnPointers...); err != nil {
-			return results, err
+			return results, errors.WithStack(err)
 		}
 		for i, colName := range cols {
 			val := columnPointers[i].(*interface{})
@@ -186,7 +188,15 @@ func (litedb LiteDB) Query(q string, args ...interface{}) ([]Note, error) {
 		}
 		results = append(results, m)
 	}
-	return results, err
+	err = rows.Close()
+	if err != nil {
+		return results, errors.WithStack(err)
+	}
+	err = rows.Err()
+	if err != nil {
+		return results, errors.WithStack(err)
+	}
+	return results, errors.WithStack(err)
 }
 
 func escape(s string) string {
