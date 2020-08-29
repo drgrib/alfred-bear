@@ -46,11 +46,11 @@ WHERE
 	note.ZARCHIVED=0
 	AND note.ZTRASHED=0
 	AND (
-		utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-		lower(note.ZTEXT) LIKE utflower('%%%s%%')
+		utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
+		lower(note.ZTEXT) LIKE utflower('%'||$1||'%')
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
+ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
 LIMIT 400
 `
 
@@ -152,9 +152,9 @@ func NewBearDB() (LiteDB, error) {
 	return litedb, err
 }
 
-func (litedb LiteDB) Query(q string) ([]Note, error) {
+func (litedb LiteDB) Query(q string, args ...interface{}) ([]Note, error) {
 	results := []Note{}
-	rows, err := litedb.db.Query(q)
+	rows, err := litedb.db.Query(q, args...)
 	if err != nil {
 		return results, err
 	}
@@ -237,7 +237,7 @@ func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note
 func (litedb LiteDB) QueryNotesByText(text string) ([]Note, error) {
 	wordQuery := func(word string) ([]Note, error) {
 		word = escape(word)
-		return litedb.Query(fmt.Sprintf(NOTES_BY_QUERY, word, word, word))
+		return litedb.Query(NOTES_BY_QUERY, word)
 	}
 	return multiWordQuery(text, wordQuery)
 }
