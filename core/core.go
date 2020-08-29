@@ -8,6 +8,7 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/drgrib/alfred"
+	"github.com/pkg/errors"
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/drgrib/alfred-bear/db"
@@ -186,21 +187,21 @@ func GetSearchRows(litedb db.LiteDB, query Query) ([]db.Note, error) {
 	case query.WordString == "" && len(query.Tags) == 0 && query.LastToken == "":
 		rows, err := litedb.Query(db.RECENT_NOTES)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return rows, nil
 
 	case len(query.Tags) != 0:
 		rows, err := litedb.QueryNotesByTextAndTags(query.WordString, query.Tags)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return rows, nil
 
 	default:
 		rows, err := litedb.QueryNotesByText(query.WordString)
 		if err != nil {
-			return nil, err
+			return nil, errors.WithStack(err)
 		}
 		return rows, nil
 	}

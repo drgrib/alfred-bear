@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"strings"
 
@@ -11,33 +12,35 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
+
 	createIndex := 2
 	query := core.ParseQuery(os.Args[1])
 
 	litedb, err := db.NewBearDB()
 	if err != nil {
-		panic(err)
+		log.Fatalf("%+v", err)
 	}
 
 	autocompleted, err := core.Autocomplete(litedb, query)
 	if err != nil {
-		panic(err)
+		log.Fatalf("%+v", err)
 	}
 
 	if !autocompleted {
 		searchRows, err := core.GetSearchRows(litedb, query)
 		if err != nil {
-			panic(err)
+			log.Fatalf("%+v", err)
 		}
 
 		appSearchItem, err := core.GetAppSearchItem(query)
 		if err != nil {
-			panic(err)
+			log.Fatalf("%+v", err)
 		}
 
 		createItem, err := core.GetCreateItem(query)
 		if err != nil {
-			panic(err)
+			log.Fatalf("%+v", err)
 		}
 
 		if len(searchRows) > 0 {
