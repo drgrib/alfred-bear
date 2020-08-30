@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -90,22 +91,26 @@ func (query Query) String() string {
 	return strings.Join(query.Tokens, " ")
 }
 
+var spaces = regexp.MustCompile(`\s+`)
+
 func ParseQuery(arg string) Query {
-	query := Query{}
-	query.Tokens = strings.Split(norm.NFC.String(arg), " ")
-	query.Tags = []string{}
-	words := []string{}
+	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
+
+	query.Tags = make([]string, 0, len(query.Tokens))
+	words := make([]string, 0, len(query.Tokens))
+
 	for _, e := range query.Tokens {
 		switch {
-		case e == "":
 		case strings.HasPrefix(e, "#"):
 			query.Tags = append(query.Tags, e)
 		default:
 			words = append(words, e)
 		}
 	}
+
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
 	query.WordString = strings.Join(words, " ")
+
 	return query
 }
 
