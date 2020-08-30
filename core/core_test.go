@@ -16,14 +16,14 @@ func TestParseQuery(t *testing.T) {
 		{
 			name:     "empty arg",
 			arg:      "",
-			expected: core.Query{},
+			expected: core.Query{Tokens: []string{""}, Tags: []string{}},
 		},
 		{
 			name: "single word",
 			arg:  "hello",
 			expected: core.Query{
 				Tokens:     []string{"hello"},
-				Tags:       nil,
+				Tags:       []string{},
 				LastToken:  "hello",
 				WordString: "hello",
 			},
@@ -33,7 +33,7 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello world",
 			expected: core.Query{
 				Tokens:     []string{"hello", "world"},
-				Tags:       nil,
+				Tags:       []string{},
 				LastToken:  "world",
 				WordString: "hello world",
 			},
@@ -43,7 +43,7 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello  \t world",
 			expected: core.Query{
 				Tokens:     []string{"hello", "world"},
-				Tags:       nil,
+				Tags:       []string{},
 				LastToken:  "world",
 				WordString: "hello world",
 			},
@@ -53,9 +53,9 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello #inbox stuff",
 			expected: core.Query{
 				Tokens:     []string{"hello", "#inbox", "stuff"},
-				Tags:       []string{"inbox"},
+				Tags:       []string{"#inbox"},
 				LastToken:  "stuff",
-				WordString: "hello #inbox stuff",
+				WordString: "hello stuff",
 			},
 		},
 		{
@@ -63,9 +63,19 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello #inbox",
 			expected: core.Query{
 				Tokens:     []string{"hello", "#inbox"},
-				Tags:       []string{"inbox"},
+				Tags:       []string{"#inbox"},
 				LastToken:  "#inbox",
-				WordString: "hello #inbox",
+				WordString: "hello",
+			},
+		},
+		{
+			name: "multiword tag",
+			arg:  "oh boy #hello tag#",
+			expected: core.Query{
+				Tokens:     []string{"oh", "boy", "#hello tag#"},
+				Tags:       []string{"#hello tag#"},
+				LastToken:  "#hello tag#",
+				WordString: "oh boy #hello tag#",
 			},
 		},
 	}
@@ -73,7 +83,9 @@ func TestParseQuery(t *testing.T) {
 	for _, test := range tests {
 		// nolint: scopelint
 		t.Run(test.name, func(t *testing.T) {
-			So(core.ParseQuery(test.arg), ShouldResemble, test.expected)
+			if ok, msg := So(core.ParseQuery(test.arg), ShouldResemble, test.expected); !ok {
+				t.Error(msg)
+			}
 		})
 	}
 }
