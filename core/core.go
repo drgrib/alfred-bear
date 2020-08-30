@@ -91,7 +91,7 @@ func (query Query) String() string {
 	return strings.Join(query.Tokens, " ")
 }
 
-var spaces = regexp.MustCompile(`\s+`)
+var spaces = regexp.MustCompile(`\s+`) //nolint:gochecknoglobals
 
 func ParseQuery(arg string) Query {
 	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
