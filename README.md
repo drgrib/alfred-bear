@@ -102,3 +102,9 @@ This is a quirk of macOS 10.15 and above. Apple currently forces developers to p
 After seeing this warning, you have to go to **System Preferences > Security & Privacy > General** and click the new button that has appeared to allow the executable to run. You then have to run it again and you will see this security warning *again* but now it will have a new button that lets you allow the executable to run.
 
 These warnings will appear once for each of the 5 executable inside the workflow as you use new features. Once you have authorized all 5, you won't see these warnings anymore until you install a new version.
+
+If you do not see the above security warnings, do the following
+1. Go to 'Workflows' section in Alfred Preferences
+2. Right click on 'Bear' by drgrib and select 'Open in Terminal'
+3. Copy this code and execute it `chmod +x cmd/create/create cmd/csearch/csearch cmd/link/link cmd/search/search cmd/setcursor/setcursor`.
+This should fix 'Permission Denied' errors.
