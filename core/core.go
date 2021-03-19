@@ -109,7 +109,7 @@ func ParseQuery(arg string) Query {
 	}
 
 	query.LastToken = query.Tokens[len(query.Tokens)-1]
-	query.WordString = strings.Join(words, " ")
+	query.WordString = strings.TrimSpace(strings.Join(words, " "))
 
 	return query
 }
