@@ -53,7 +53,7 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello #inbox stuff",
 			expected: core.Query{
 				Tokens:     []string{"hello", "#inbox", "stuff"},
-				Tags:       []string{"#inbox"},
+				Tags:       []string{"inbox"},
 				LastToken:  "stuff",
 				WordString: "hello stuff",
 			},
@@ -63,22 +63,31 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello #inbox",
 			expected: core.Query{
 				Tokens:     []string{"hello", "#inbox"},
-				Tags:       []string{"#inbox"},
+				Tags:       []string{"inbox"},
 				LastToken:  "#inbox",
 				WordString: "hello",
 			},
 		},
-		// this would be nice to have in future
-		//{
-		//	name: "multiword tag",
-		//	arg:  "oh boy #hello tag#",
-		//	expected: core.Query{
-		//		Tokens:     []string{"oh", "boy", "#hello tag#"},
-		//		Tags:       []string{"#hello tag#"},
-		//		LastToken:  "#hello tag#",
-		//		WordString: "oh boy #hello tag#",
-		//	},
-		//},
+		{
+			name: "multiword tag",
+			arg:  "#hello tag#",
+			expected: core.Query{
+				Tokens:     []string{"#hello", "tag#"},
+				Tags:       []string{"hello tag"},
+				LastToken:  "tag#",
+				WordString: "",
+			},
+		},
+		{
+			name: "complex multiword tag",
+			arg:  "hi #test tag# #test2 there",
+			expected: core.Query{
+				Tokens:     []string{"hi", "#test", "tag#", "#test2", "there"},
+				Tags:       []string{"test tag", "test2"},
+				LastToken:  "there",
+				WordString: "hi there",
+			},
+		},
 	}
 
 	for _, test := range tests {

@@ -232,7 +232,7 @@ func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction stri
 func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note, error) {
 	tagConditions := []string{}
 	for _, t := range tags {
-		c := fmt.Sprintf("utflower(tag.ZTITLE) = utflower('%s')", t[1:])
+		c := fmt.Sprintf("utflower(tag.ZTITLE) = utflower('%s')", t)
 		tagConditions = append(tagConditions, c)
 	}
 	tagConjunction := strings.Join(tagConditions, " OR ")

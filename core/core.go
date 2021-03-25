@@ -92,25 +92,24 @@ func (query Query) String() string {
 }
 
 var spaces = regexp.MustCompile(`\s+`) //nolint:gochecknoglobals
+var tagClean = regexp.MustCompile(`(^#|#$)`)
+var tagFetch = regexp.MustCompile(`#\w+([^#]*\w#)?`)
 
 func ParseQuery(arg string) Query {
 	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
 
-	query.Tags = make([]string, 0, len(query.Tokens))
-	words := make([]string, 0, len(query.Tokens))
+	queryArgString := norm.NFC.String(arg)
+	query.Tags = []string{}
 
-	for _, e := range query.Tokens {
-		switch {
-		case strings.HasPrefix(e, "#"):
-			query.Tags = append(query.Tags, e)
-		default:
-			words = append(words, e)
-		}
+	tags := tagFetch.FindAllString(queryArgString, -1)
+	for _, tag := range tags {
+		query.Tags = append(query.Tags, string(tagClean.ReplaceAll([]byte(tag), []byte(""))))
 	}
 
-	query.LastToken = query.Tokens[len(query.Tokens)-1]
-	query.WordString = strings.TrimSpace(strings.Join(words, " "))
+	searchString := string(tagFetch.ReplaceAll([]byte(queryArgString), []byte("")))
 
+	query.LastToken = query.Tokens[len(query.Tokens)-1]
+	query.WordString = strings.Join(strings.Fields(searchString), " ")
 	return query
 }
 
@@ -169,7 +168,7 @@ func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 		}
 
 		for _, row := range rows {
-			tag := "#" + row[db.TitleKey]
+			tag := "#" + row[db.TitleKey] + "#"
 			autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + tag + " "
 			alfred.Add(alfred.Item{
 				Title:        tag,
