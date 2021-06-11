@@ -63,12 +63,35 @@
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
+				<key>modifiers</key>
+				<integer>1572864</integer>
+				<key>modifiersubtext</key>
+				<string>Paste Table of Contents</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
 		</array>
 		<key>1197E934-E010-48A8-AF8E-CF0CF301C261</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
 				<string>5EC53F91-D330-4140-B05A-96D7DCFCD135</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A17A4C24-15DE-4D34-9704-76E6483B412C</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -155,6 +178,16 @@
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
+				<key>modifiers</key>
+				<integer>1572864</integer>
+				<key>modifiersubtext</key>
+				<string>Paste Table of Contents</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
 		</array>
 		<key>59A4C675-2898-4D74-AA9C-C3F3E4A96A0A</key>
 		<array>
@@ -198,6 +231,16 @@
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
+				<key>modifiers</key>
+				<integer>1572864</integer>
+				<key>modifiersubtext</key>
+				<string>Paste Table of Contents</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
 		</array>
 		<key>5D8E2482-13A9-4FCB-96CA-C66F35949E2A</key>
 		<array>
@@ -238,6 +281,16 @@
 				<integer>131072</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Link to Note</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
+				<key>modifiers</key>
+				<integer>1572864</integer>
+				<key>modifiersubtext</key>
+				<string>Paste Table of Contents</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -318,6 +371,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>A17A4C24-15DE-4D34-9704-76E6483B412C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B5A664D0-6B7A-4F14-9967-A9D90AA32295</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>A6BFE29A-BCCF-476F-8E07-A7C9CA647422</key>
 		<array>
 			<dict>
@@ -336,6 +402,19 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>B0876656-9842-4ED2-A972-BD955ED9E68A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>B5A664D0-6B7A-4F14-9967-A9D90AA32295</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>DA7313D4-6521-4C7B-B408-903CF0C760FB</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -1303,6 +1382,113 @@
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string></string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>4</integer>
+						<key>matchstring</key>
+						<string>^(title=|tags=|text=)</string>
+						<key>outputlabel</key>
+						<string>CreateItem</string>
+						<key>uid</key>
+						<string>296ECF8E-6E4D-49DA-9B92-9883C5F5605A</string>
+					</dict>
+					<dict>
+						<key>inputstring</key>
+						<string></string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>4</integer>
+						<key>matchstring</key>
+						<string>^(term=|tag=)|^$</string>
+						<key>outputlabel</key>
+						<string>AppSearchItem</string>
+						<key>uid</key>
+						<string>FDEE12A9-8486-48CB-B48E-6893D573BBD7</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>NoteID|searchCallback</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>cmd/toc/toc "{query}"</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>B5A664D0-6B7A-4F14-9967-A9D90AA32295</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<true/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>DA7313D4-6521-4C7B-B408-903CF0C760FB</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>matchmode</key>
+				<integer>1</integer>
+				<key>matchstring</key>
+				<string>([^\|]+)\|([^\|]*)</string>
+				<key>regexcaseinsensitive</key>
+				<false/>
+				<key>regexmultiline</key>
+				<false/>
+				<key>replacestring</key>
+				<string>$1</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.replace</string>
+			<key>uid</key>
+			<string>A17A4C24-15DE-4D34-9704-76E6483B412C</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string></string>
@@ -1328,6 +1514,15 @@
 			<integer>1105</integer>
 			<key>ypos</key>
 			<integer>1070</integer>
+		</dict>
+		<key>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</key>
+		<dict>
+			<key>note</key>
+			<string>Paste Link to Note</string>
+			<key>xpos</key>
+			<integer>810</integer>
+			<key>ypos</key>
+			<integer>1185</integer>
 		</dict>
 		<key>1E89EC6B-5E60-4AEE-800A-55A1E91B9182</key>
 		<dict>
@@ -1434,6 +1629,13 @@
 			<key>ypos</key>
 			<integer>805</integer>
 		</dict>
+		<key>A17A4C24-15DE-4D34-9704-76E6483B412C</key>
+		<dict>
+			<key>xpos</key>
+			<integer>1105</integer>
+			<key>ypos</key>
+			<integer>1240</integer>
+		</dict>
 		<key>A6BFE29A-BCCF-476F-8E07-A7C9CA647422</key>
 		<dict>
 			<key>note</key>
@@ -1459,6 +1661,15 @@
 			<key>ypos</key>
 			<integer>320</integer>
 		</dict>
+		<key>B5A664D0-6B7A-4F14-9967-A9D90AA32295</key>
+		<dict>
+			<key>note</key>
+			<string>ToC</string>
+			<key>xpos</key>
+			<integer>1195</integer>
+			<key>ypos</key>
+			<integer>1210</integer>
+		</dict>
 		<key>C09F10FC-E57F-47DA-9C55-84E9A68D2348</key>
 		<dict>
 			<key>note</key>
@@ -1483,6 +1694,15 @@
 			<integer>810</integer>
 			<key>ypos</key>
 			<integer>1015</integer>
+		</dict>
+		<key>DA7313D4-6521-4C7B-B408-903CF0C760FB</key>
+		<dict>
+			<key>note</key>
+			<string>Paste Link</string>
+			<key>xpos</key>
+			<integer>1350</integer>
+			<key>ypos</key>
+			<integer>1210</integer>
 		</dict>
 		<key>E2FCB7C2-A812-4419-9CD0-2E74282DF3FE</key>
 		<dict>
@@ -1520,7 +1740,7 @@
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.1.6</string>
+	<string>1.1.7</string>
 	<key>webaddress</key>
 	<string>https://github.com/drgrib/alfred-bear</string>
 </dict>
