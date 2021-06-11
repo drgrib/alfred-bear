@@ -69,7 +69,7 @@ While in your Bear notes, you can paste a link to another note by searching for 
 
 ### Table of Contents Pasting
 
-Similarly, you can paste a table of contents for a note by searching for it and holding down the command and option keys.
+Similarly, you can paste a table of contents for a note by searching for it and holding down the command and shift keys.
 
 ## New Notes
 `bn` or `bnew` followed by title and optional tags.

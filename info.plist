@@ -67,7 +67,7 @@
 				<key>destinationuid</key>
 				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
 				<key>modifiers</key>
-				<integer>1572864</integer>
+				<integer>1179648</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Table of Contents</string>
 				<key>vitoclose</key>
@@ -182,7 +182,7 @@
 				<key>destinationuid</key>
 				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
 				<key>modifiers</key>
-				<integer>1572864</integer>
+				<integer>1179648</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Table of Contents</string>
 				<key>vitoclose</key>
@@ -235,7 +235,7 @@
 				<key>destinationuid</key>
 				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
 				<key>modifiers</key>
-				<integer>1572864</integer>
+				<integer>1179648</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Table of Contents</string>
 				<key>vitoclose</key>
@@ -288,7 +288,7 @@
 				<key>destinationuid</key>
 				<string>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</string>
 				<key>modifiers</key>
-				<integer>1572864</integer>
+				<integer>1179648</integer>
 				<key>modifiersubtext</key>
 				<string>Paste Table of Contents</string>
 				<key>vitoclose</key>
