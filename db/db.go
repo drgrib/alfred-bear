@@ -17,6 +17,7 @@ const (
 	DbPath = "~/Library/Group Containers/9K33E3U3T4.net.shinyfrog.bear/Application Data/database.sqlite"
 
 	TitleKey  = "ZTITLE"
+	TextKey   = "ZTEXT"
 	TagsKey   = "group_concat(tag.ZTITLE)"
 	NoteIDKey = "ZUNIQUEIDENTIFIER"
 
@@ -106,6 +107,19 @@ LIMIT 25
 	NOTE_TITLE_BY_ID = `
 SELECT DISTINCT
     ZTITLE
+FROM
+    ZSFNOTE
+WHERE
+    ZARCHIVED=0
+    AND ZTRASHED=0
+    AND ZUNIQUEIDENTIFIER='%s'
+ORDER BY
+    ZMODIFICATIONDATE DESC
+LIMIT 25
+`
+	NOTE_TEXT_BY_ID = `
+SELECT DISTINCT
+    ZTEXT
 FROM
     ZSFNOTE
 WHERE

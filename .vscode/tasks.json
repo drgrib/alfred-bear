@@ -9,6 +9,7 @@
                 "go build csearch",
                 "go build search",
                 "go build link",
+                "go build toc",
                 "go build create",
                 "go build setcursor",
             ],
@@ -50,6 +51,19 @@
                 "cwd": "${workspaceFolder}/cmd/link"
             },
             "command": "rm -f link; go build",
+            "presentation": {
+                "focus": true,
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "go build toc",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/toc"
+            },
+            "command": "rm -f toc; go build",
             "presentation": {
                 "focus": true,
             },
