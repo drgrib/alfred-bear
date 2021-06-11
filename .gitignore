@@ -2,5 +2,6 @@
 cmd/create/create
 cmd/csearch/csearch
 cmd/link/link
+cmd/toc/toc
 cmd/search/search
 cmd/setcursor/setcursor

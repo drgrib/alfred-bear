@@ -4,7 +4,7 @@
 Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) using [Alfred](https://www.alfredapp.com/workflows/).
 
 ## Install
-Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.6/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.7/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 
 ## Search
 `bs` or `bsearch`
@@ -66,6 +66,10 @@ While in your Bear notes, you can paste a link to another note by searching for 
 
 <img src="doc/Link1.png" width="500">
 <img src="doc/Link2.png" width="500">
+
+### Table of Contents Pasting
+
+Similarly, you can paste a table of contents for a note by searching for it and holding down the command and option keys.
 
 ## New Notes
 `bn` or `bnew` followed by title and optional tags.
