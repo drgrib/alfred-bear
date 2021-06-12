@@ -1518,7 +1518,7 @@
 		<key>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</key>
 		<dict>
 			<key>note</key>
-			<string>Paste Link to Note</string>
+			<string>Paste Link to Table of Contents</string>
 			<key>xpos</key>
 			<integer>810</integer>
 			<key>ypos</key>
