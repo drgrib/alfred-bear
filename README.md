@@ -119,4 +119,4 @@ If you want to authorize all Bear Workflow executables at once or if you do not 
 xattr -rd com.apple.quarantine cmd
 ```
 
-This should allow the Alfred Bear executables execute and fix the 'Permission Denied' errors.
+This should authorize all the Alfred Bear the executables and fix the 'Permission Denied' errors.
