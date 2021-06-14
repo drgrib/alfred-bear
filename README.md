@@ -4,7 +4,7 @@
 Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) using [Alfred](https://www.alfredapp.com/workflows/).
 
 ## Install
-Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.8/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+Just [download](https://github.com/drgrib/alfred-bear/releases/download/1.1.8/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it. Please also set the right permissions as [described below](#set-authorization-at-once)
 
 ## Search
 `bs` or `bsearch`
@@ -109,8 +109,11 @@ After seeing this warning, you have to go to **System Preferences > Security & P
 
 These warnings will appear once for each of the 5 executable inside the workflow as you use new features. Once you have authorized all 5, you won't see these warnings anymore until you install a new version.
 
-If you do not see the above security warnings, do the following
+### Set Authorization at once
+If you want to allow all Bear Workflow executables at once or, if you do not see the above security warnings, do the following:
+
 1. Go to 'Workflows' section in Alfred Preferences
 2. Right click on 'Bear' by drgrib and select 'Open in Terminal'
-3. Copy this code and execute it `chmod +x cmd/create/create cmd/csearch/csearch cmd/link/link cmd/search/search cmd/setcursor/setcursor`.
-This should fix 'Permission Denied' errors.
+3. Copy this code and execute it `xattr -rd com.apple.quarantine cmd`.
+
+This will allow the executables of Alfred Bear to be executed and will fix the 'Permission Denied' errors.
