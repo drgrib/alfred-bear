@@ -120,3 +120,13 @@ xattr -rd com.apple.quarantine cmd
 ```
 
 This should authorize all the Alfred Bear the executables and fix the security errors.
+
+### 🍎 Apple Silicon Macs
+If your mac is based on Apple Silicon chip, you need to have Rosetta installed on your system, otherwise Alfred workflows will fail silently.
+
+<img width="582" alt="Screen Shot 2021-12-29 at 9 06 02 AM" src="https://user-images.githubusercontent.com/9834975/147670554-eae2ca66-b929-4a03-b59e-545d3e660082.png">
+
+Copy this command and execute in terminal to install Rosetta:
+```sh
+softwareupdate --install-rosetta
+```
