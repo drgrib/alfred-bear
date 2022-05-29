@@ -54,7 +54,7 @@ WHERE
 	)
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 400
+LIMIT 200
 `
 
 	NOTES_BY_TAGS_AND_QUERY = `
@@ -85,7 +85,7 @@ WHERE note.ZUNIQUEIDENTIFIER IN (
 )
 GROUP BY note.ZUNIQUEIDENTIFIER
 ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 400
+LIMIT 200
 `
 
 	TAGS_BY_TITLE = `
