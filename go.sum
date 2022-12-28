@@ -4,8 +4,8 @@ github.com/drgrib/alfred v0.0.0-20180713231015-cbcb1a4b1a30 h1:YJztq9iEgAjAxoyya
 github.com/drgrib/alfred v0.0.0-20180713231015-cbcb1a4b1a30/go.mod h1:i0gA+4g42sioTtf5J8DHLunASnD4RhyzXQqVNeoTV/o=
 github.com/drgrib/mac v0.0.0-20200321221020-4f366006daac h1:dbnAsr/ngd8DSzd3x/2CGQ8ubL5oX2R+Cwdin66Snbc=
 github.com/drgrib/mac v0.0.0-20200321221020-4f366006daac/go.mod h1:UaS3hPRZNCmKPJ1c9eKlIaehAOpSpBDLEsJTP/U6BSs=
-github.com/mattn/go-sqlite3 v2.0.3+incompatible h1:gXHsfypPkaMZrKbD5209QV9jbUTJKjyR5WD3HYQSd+U=
-github.com/mattn/go-sqlite3 v2.0.3+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
+github.com/mattn/go-sqlite3 v1.14.9 h1:10HX2Td0ocZpYEjhilsuo6WWtUqttj2Kb0KtD86/KYA=
+github.com/mattn/go-sqlite3 v1.14.9/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/smartystreets/assertions v1.1.1 h1:T/YLemO5Yp7KPzS+lVtu+WsHn8yoSwTfItdAd1r3cck=
