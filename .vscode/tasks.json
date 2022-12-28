@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "go build",
+            "label": "go build all",
             "dependsOn": [
                 "go build csearch",
                 "go build search",
@@ -13,10 +13,7 @@
                 "go build create",
                 "go build setcursor",
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build"
         },
         {
             "label": "go build csearch",
