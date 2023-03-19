@@ -22,110 +22,140 @@ const (
 	NoteIDKey = "ZUNIQUEIDENTIFIER"
 
 	RECENT_NOTES = `
-SELECT DISTINCT
-	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+SELECT
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE,
+    GROUP_CONCAT(tag.ZTITLE) AS TAGS
 FROM
-	ZSFNOTE note
-	LEFT OUTER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-	LEFT OUTER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+    ZSFNOTE note
+LEFT JOIN
+    Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+LEFT JOIN
+    ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
 WHERE
-	note.ZARCHIVED=0
-	AND note.ZTRASHED=0
-GROUP BY note.ZUNIQUEIDENTIFIER
+    note.ZARCHIVED = 0
+    AND note.ZTRASHED = 0
+GROUP BY
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE
 ORDER BY
-	note.ZMODIFICATIONDATE DESC
+    note.ZMODIFICATIONDATE DESC
 LIMIT 25
 	`
 
 	NOTES_BY_QUERY = `
-SELECT DISTINCT
-	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+    SELECT
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE,
+    GROUP_CONCAT(tag.ZTITLE) AS TAGS
 FROM
-	ZSFNOTE note
-	LEFT OUTER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-	LEFT OUTER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
+    ZSFNOTE note
+LEFT JOIN
+    Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+LEFT JOIN
+    ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
 WHERE
-	note.ZARCHIVED=0
-	AND note.ZTRASHED=0
-	AND note.ZTEXT IS NOT NULL
-	AND (
-		utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
-		utflower(note.ZTEXT) LIKE utflower('%'||$1||'%')
-	)
-GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 200
+    note.ZARCHIVED = 0
+    AND note.ZTRASHED = 0
+    AND note.ZTEXT IS NOT NULL
+    AND (
+        utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
+        utflower(note.ZTEXT) LIKE utflower('%'||$1||'%')
+    )
+GROUP BY
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE
+ORDER BY
+    CASE WHEN utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') THEN 0 ELSE 1 END,
+    note.ZMODIFICATIONDATE DESC
+LIMIT 400
 `
 
 	NOTES_BY_TAGS_AND_QUERY = `
-SELECT DISTINCT
-	note.ZUNIQUEIDENTIFIER, note.ZTITLE, group_concat(tag.ZTITLE)
+    SELECT
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE,
+    GROUP_CONCAT(tag.ZTITLE) AS TAGS
 FROM
-	ZSFNOTE note
-	INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-	INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
-WHERE note.ZUNIQUEIDENTIFIER IN (
-	SELECT
-		note.ZUNIQUEIDENTIFIER
-	FROM
-		ZSFNOTE note
-		INNER JOIN Z_7TAGS nTag ON note.Z_PK = nTag.Z_7NOTES
-		INNER JOIN ZSFNOTETAG tag ON nTag.Z_14TAGS = tag.Z_PK
-	WHERE
-		note.ZARCHIVED=0
-		AND note.ZTRASHED=0
-		AND note.ZTEXT IS NOT NULL
-		AND (%s)
-		AND (
-			utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-			utflower(note.ZTEXT) LIKE utflower('%%%s%%')
-		)
-	GROUP BY note.ZUNIQUEIDENTIFIER
-	HAVING COUNT(*) >= %d
-)
-GROUP BY note.ZUNIQUEIDENTIFIER
-ORDER BY case when utflower(note.ZTITLE) LIKE utflower('%%%s%%') then 0 else 1 end, note.ZMODIFICATIONDATE DESC
-LIMIT 200
+    ZSFNOTE note
+INNER JOIN
+    Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+INNER JOIN
+    ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+WHERE
+    note.ZUNIQUEIDENTIFIER IN (
+        SELECT
+            note.ZUNIQUEIDENTIFIER
+        FROM
+            ZSFNOTE note
+        INNER JOIN
+            Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+        INNER JOIN
+            ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+        WHERE
+            note.ZARCHIVED = 0
+            AND note.ZTRASHED = 0
+            AND note.ZTEXT IS NOT NULL
+            AND (%s)
+            AND (
+                utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
+                utflower(note.ZTEXT) LIKE utflower('%%%s%%')
+            )
+        GROUP BY
+            note.ZUNIQUEIDENTIFIER
+        HAVING
+            COUNT(*) >= %d
+    )
+GROUP BY
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE
+ORDER BY
+    CASE WHEN utflower(note.ZTITLE) LIKE utflower('%%%s%%') THEN 0 ELSE 1 END,
+    note.ZMODIFICATIONDATE DESC
+LIMIT 400
 `
 
 	TAGS_BY_TITLE = `
-SELECT DISTINCT
-	t.ZTITLE
+SELECT
+    DISTINCT t.ZTITLE
 FROM
-	ZSFNOTE n
-	INNER JOIN Z_7TAGS nt ON n.Z_PK = nt.Z_7NOTES
-	INNER JOIN ZSFNOTETAG t ON nt.Z_14TAGS = t.Z_PK
+    ZSFNOTE n
+INNER JOIN
+    Z_5TAGS nt ON n.Z_PK = nt.Z_5NOTES
+INNER JOIN
+    ZSFNOTETAG t ON nt.Z_13TAGS = t.Z_PK
 WHERE
-	n.ZARCHIVED=0
-	AND n.ZTRASHED=0
-	AND utflower(t.ZTITLE) LIKE utflower('%%%s%%')
+    n.ZARCHIVED = 0
+    AND n.ZTRASHED = 0
+    AND UTFLOWER(t.ZTITLE) LIKE UTFLOWER('%%%s%%')
 ORDER BY
-	t.ZMODIFICATIONDATE DESC
+    t.ZMODIFICATIONDATE DESC
 LIMIT 25
+
 `
 
 	NOTE_TITLE_BY_ID = `
-SELECT DISTINCT
-    ZTITLE
+    SELECT
+    DISTINCT ZTITLE
 FROM
     ZSFNOTE
 WHERE
-    ZARCHIVED=0
-    AND ZTRASHED=0
-    AND ZUNIQUEIDENTIFIER='%s'
+    ZARCHIVED = 0
+    AND ZTRASHED = 0
+    AND ZUNIQUEIDENTIFIER = '%s'
 ORDER BY
     ZMODIFICATIONDATE DESC
 LIMIT 25
 `
 	NOTE_TEXT_BY_ID = `
-SELECT DISTINCT
-    ZTEXT
+    SELECT
+    DISTINCT ZTEXT
 FROM
     ZSFNOTE
 WHERE
-    ZARCHIVED=0
-    AND ZTRASHED=0
-    AND ZUNIQUEIDENTIFIER='%s'
+    ZARCHIVED = 0
+    AND ZTRASHED = 0
+    AND ZUNIQUEIDENTIFIER = '%s'
 ORDER BY
     ZMODIFICATIONDATE DESC
 LIMIT 25
