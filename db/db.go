@@ -18,7 +18,7 @@ const (
 
 	TitleKey  = "ZTITLE"
 	TextKey   = "ZTEXT"
-	TagsKey   = "group_concat(tag.ZTITLE)"
+	TagsKey   = "TAGS"
 	NoteIDKey = "ZUNIQUEIDENTIFIER"
 
 	RECENT_NOTES = `

@@ -559,6 +559,19 @@
 				<false/>
 			</dict>
 		</array>
+		<key>F660B56D-669A-460D-8908-9E62C0F30250</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5D8E2482-13A9-4FCB-96CA-C66F35949E2A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>drgrib</string>
@@ -694,6 +707,37 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>45</integer>
+				<key>hotmod</key>
+				<integer>524288</integer>
+				<key>hotstring</key>
+				<string>B</string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>F660B56D-669A-460D-8908-9E62C0F30250</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>concurrently</key>
 				<false/>
 				<key>escaping</key>
@@ -820,6 +864,8 @@
 				</array>
 				<key>elselabel</key>
 				<string>NoteID|searchCallback</string>
+				<key>hideelse</key>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.utility.conditional</string>
@@ -978,6 +1024,8 @@
 				</array>
 				<key>elselabel</key>
 				<string>NoteID|searchCallback</string>
+				<key>hideelse</key>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.utility.conditional</string>
@@ -1022,6 +1070,8 @@
 				</array>
 				<key>elselabel</key>
 				<string>NoteID|searchCallback</string>
+				<key>hideelse</key>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.utility.conditional</string>
@@ -1249,6 +1299,8 @@
 				</array>
 				<key>elselabel</key>
 				<string>NoteID|searchCallback</string>
+				<key>hideelse</key>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.utility.conditional</string>
@@ -1260,6 +1312,8 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>availableviaurlhandler</key>
+				<false/>
 				<key>triggerid</key>
 				<string>search bear</string>
 			</dict>
@@ -1418,6 +1472,8 @@
 				</array>
 				<key>elselabel</key>
 				<string>NoteID|searchCallback</string>
+				<key>hideelse</key>
+				<false/>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.utility.conditional</string>
@@ -1497,250 +1553,259 @@
 		<key>0344727C-3BE1-4BC7-887A-82BECFC34B13</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1095</integer>
+			<real>1095</real>
 			<key>ypos</key>
-			<integer>435</integer>
+			<real>435</real>
 		</dict>
 		<key>11295A3D-C960-41A3-9670-DFCBDF58C9D9</key>
 		<dict>
 			<key>xpos</key>
-			<integer>170</integer>
+			<real>170</real>
 			<key>ypos</key>
-			<integer>880</integer>
+			<real>880</real>
 		</dict>
 		<key>1197E934-E010-48A8-AF8E-CF0CF301C261</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1105</integer>
+			<real>1105</real>
 			<key>ypos</key>
-			<integer>1070</integer>
+			<real>1070</real>
 		</dict>
 		<key>1E42F790-0DFA-452B-A0F5-5FEA0ACA22E5</key>
 		<dict>
 			<key>note</key>
 			<string>Paste Link to Table of Contents</string>
 			<key>xpos</key>
-			<integer>810</integer>
+			<real>810</real>
 			<key>ypos</key>
-			<integer>1185</integer>
+			<real>1185</real>
 		</dict>
 		<key>1E89EC6B-5E60-4AEE-800A-55A1E91B9182</key>
 		<dict>
 			<key>note</key>
 			<string>Create Note</string>
 			<key>xpos</key>
-			<integer>1380</integer>
+			<real>1380</real>
 			<key>ypos</key>
-			<integer>35</integer>
+			<real>35</real>
 		</dict>
 		<key>27456FAE-DBC0-4A91-9753-517B00831DB3</key>
 		<dict>
 			<key>note</key>
 			<string>Paste Link</string>
 			<key>xpos</key>
-			<integer>1350</integer>
+			<real>1350</real>
 			<key>ypos</key>
-			<integer>1040</integer>
+			<real>1040</real>
 		</dict>
 		<key>2B3D525C-64BF-4146-92F4-A7012F05F6A2</key>
 		<dict>
 			<key>note</key>
 			<string>Set Cursor</string>
 			<key>xpos</key>
-			<integer>1380</integer>
+			<real>1380</real>
 			<key>ypos</key>
-			<integer>635</integer>
+			<real>635</real>
 		</dict>
 		<key>48FBADDF-A8D0-41D7-B180-469BA359C57F</key>
 		<dict>
 			<key>xpos</key>
-			<integer>355</integer>
+			<real>355</real>
 			<key>ypos</key>
-			<integer>35</integer>
+			<real>35</real>
 		</dict>
 		<key>4D2DFA01-3886-42C0-82EE-5B0BE63B02D2</key>
 		<dict>
 			<key>xpos</key>
-			<integer>10</integer>
+			<real>30</real>
 			<key>ypos</key>
-			<integer>1015</integer>
+			<real>1015</real>
 		</dict>
 		<key>4D5617AA-ADE7-45B5-9C05-DA6C69781662</key>
 		<dict>
 			<key>xpos</key>
-			<integer>170</integer>
+			<real>170</real>
 			<key>ypos</key>
-			<integer>1015</integer>
+			<real>1015</real>
 		</dict>
 		<key>59A4C675-2898-4D74-AA9C-C3F3E4A96A0A</key>
 		<dict>
 			<key>xpos</key>
-			<integer>10</integer>
+			<real>30</real>
 			<key>ypos</key>
-			<integer>450</integer>
+			<real>450</real>
 		</dict>
 		<key>5D8E2482-13A9-4FCB-96CA-C66F35949E2A</key>
 		<dict>
 			<key>xpos</key>
-			<integer>10</integer>
+			<real>30</real>
 			<key>ypos</key>
-			<integer>315</integer>
+			<real>315</real>
 		</dict>
 		<key>5EC53F91-D330-4140-B05A-96D7DCFCD135</key>
 		<dict>
 			<key>note</key>
 			<string>Format Link</string>
 			<key>xpos</key>
-			<integer>1195</integer>
+			<real>1195</real>
 			<key>ypos</key>
-			<integer>1040</integer>
+			<real>1040</real>
 		</dict>
 		<key>6CEE5F7C-4415-417F-A095-4CE906185A93</key>
 		<dict>
 			<key>note</key>
 			<string>Open Note in New Window</string>
 			<key>xpos</key>
-			<integer>810</integer>
+			<real>810</real>
 			<key>ypos</key>
-			<integer>455</integer>
+			<real>455</real>
 		</dict>
 		<key>7936E4EC-9DD4-4C26-BFFD-9A300B4DC3D4</key>
 		<dict>
 			<key>note</key>
 			<string>Set Cursor</string>
 			<key>xpos</key>
-			<integer>1380</integer>
+			<real>1380</real>
 			<key>ypos</key>
-			<integer>805</integer>
+			<real>805</real>
 		</dict>
 		<key>954F3962-1F0B-42A0-9C03-127E2690FA49</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1105</integer>
+			<real>1105</real>
 			<key>ypos</key>
-			<integer>835</integer>
+			<real>835</real>
 		</dict>
 		<key>9E833A18-9A79-45A4-808C-D1891E6147CE</key>
 		<dict>
 			<key>note</key>
 			<string>Open Note by ID in App</string>
 			<key>xpos</key>
-			<integer>1190</integer>
+			<real>1190</real>
 			<key>ypos</key>
-			<integer>805</integer>
+			<real>805</real>
 		</dict>
 		<key>A17A4C24-15DE-4D34-9704-76E6483B412C</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1105</integer>
+			<real>1105</real>
 			<key>ypos</key>
-			<integer>1240</integer>
+			<real>1240</real>
 		</dict>
 		<key>A6BFE29A-BCCF-476F-8E07-A7C9CA647422</key>
 		<dict>
 			<key>note</key>
 			<string>Open Note by ID</string>
 			<key>xpos</key>
-			<integer>1190</integer>
+			<real>1190</real>
 			<key>ypos</key>
-			<integer>635</integer>
+			<real>635</real>
 		</dict>
 		<key>B0876656-9842-4ED2-A972-BD955ED9E68A</key>
 		<dict>
 			<key>note</key>
 			<string>Create Note in App</string>
 			<key>xpos</key>
-			<integer>1380</integer>
+			<real>1380</real>
 			<key>ypos</key>
-			<integer>185</integer>
+			<real>185</real>
 		</dict>
 		<key>B39E12A9-4E49-45C4-AE46-F56DEBD40B39</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1195</integer>
+			<real>1195</real>
 			<key>ypos</key>
-			<integer>320</integer>
+			<real>320</real>
 		</dict>
 		<key>B5A664D0-6B7A-4F14-9967-A9D90AA32295</key>
 		<dict>
 			<key>note</key>
 			<string>ToC</string>
 			<key>xpos</key>
-			<integer>1195</integer>
+			<real>1195</real>
 			<key>ypos</key>
-			<integer>1210</integer>
+			<real>1210</real>
 		</dict>
 		<key>C09F10FC-E57F-47DA-9C55-84E9A68D2348</key>
 		<dict>
 			<key>note</key>
 			<string>Open Note in Bear App</string>
 			<key>xpos</key>
-			<integer>810</integer>
+			<real>810</real>
 			<key>ypos</key>
-			<integer>610</integer>
+			<real>610</real>
 		</dict>
 		<key>C3AB4283-78DC-43E8-A8E5-BAB521E3E48D</key>
 		<dict>
 			<key>xpos</key>
-			<integer>355</integer>
+			<real>355</real>
 			<key>ypos</key>
-			<integer>170</integer>
+			<real>170</real>
 		</dict>
 		<key>D3FAABE3-B891-4CF6-BD99-89994FAC5A36</key>
 		<dict>
 			<key>note</key>
 			<string>Paste Link to Note</string>
 			<key>xpos</key>
-			<integer>810</integer>
+			<real>810</real>
 			<key>ypos</key>
-			<integer>1015</integer>
+			<real>1015</real>
 		</dict>
 		<key>DA7313D4-6521-4C7B-B408-903CF0C760FB</key>
 		<dict>
 			<key>note</key>
 			<string>Paste Link</string>
 			<key>xpos</key>
-			<integer>1350</integer>
+			<real>1350</real>
 			<key>ypos</key>
-			<integer>1210</integer>
+			<real>1210</real>
 		</dict>
 		<key>E2FCB7C2-A812-4419-9CD0-2E74282DF3FE</key>
 		<dict>
 			<key>note</key>
 			<string>Search Query in Bear App</string>
 			<key>xpos</key>
-			<integer>810</integer>
+			<real>810</real>
 			<key>ypos</key>
-			<integer>315</integer>
+			<real>315</real>
 		</dict>
 		<key>EE68D5DB-1C41-45BB-94EF-267F95F56024</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1105</integer>
+			<real>1105</real>
 			<key>ypos</key>
-			<integer>665</integer>
+			<real>665</real>
 		</dict>
 		<key>EFC3FC25-36AC-43BA-8054-038DDAD82831</key>
 		<dict>
 			<key>note</key>
 			<string>Search in App</string>
 			<key>xpos</key>
-			<integer>1380</integer>
+			<real>1380</real>
 			<key>ypos</key>
-			<integer>450</integer>
+			<real>450</real>
 		</dict>
 		<key>F652448D-56D0-4068-AAA0-9670D6771371</key>
 		<dict>
 			<key>xpos</key>
-			<integer>1130</integer>
+			<real>1130</real>
 			<key>ypos</key>
-			<integer>200</integer>
+			<real>200</real>
+		</dict>
+		<key>F660B56D-669A-460D-8908-9E62C0F30250</key>
+		<dict>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>170</real>
 		</dict>
 	</dict>
+	<key>userconfigurationconfig</key>
+	<array/>
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.1.8</string>
+	<string>1.2</string>
 	<key>webaddress</key>
 	<string>https://github.com/drgrib/alfred-bear</string>
 </dict>
