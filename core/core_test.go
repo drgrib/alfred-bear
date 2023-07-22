@@ -17,14 +17,13 @@ func TestParseQuery(t *testing.T) {
 		{
 			name:     "empty arg",
 			arg:      "",
-			expected: core.Query{Tokens: []string{""}, Tags: []string{}},
+			expected: core.Query{Tokens: []string{""}},
 		},
 		{
 			name: "single word",
 			arg:  "hello",
 			expected: core.Query{
 				Tokens:     []string{"hello"},
-				Tags:       []string{},
 				LastToken:  "hello",
 				WordString: "hello",
 			},
@@ -34,7 +33,6 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello world",
 			expected: core.Query{
 				Tokens:     []string{"hello", "world"},
-				Tags:       []string{},
 				LastToken:  "world",
 				WordString: "hello world",
 			},
@@ -44,7 +42,6 @@ func TestParseQuery(t *testing.T) {
 			arg:  "hello  \t world",
 			expected: core.Query{
 				Tokens:     []string{"hello", "world"},
-				Tags:       []string{},
 				LastToken:  "world",
 				WordString: "hello world",
 			},
@@ -69,17 +66,26 @@ func TestParseQuery(t *testing.T) {
 				WordString: "hello",
 			},
 		},
-		// this would be nice to have in future
-		//{
-		//	name: "multiword tag",
-		//	arg:  "oh boy #hello tag#",
-		//	expected: core.Query{
-		//		Tokens:     []string{"oh", "boy", "#hello tag#"},
-		//		Tags:       []string{"#hello tag#"},
-		//		LastToken:  "#hello tag#",
-		//		WordString: "oh boy #hello tag#",
-		//	},
-		//},
+		{
+			name: "multiword tag",
+			arg:  "oh boy #hello tag#",
+			expected: core.Query{
+				Tokens:     []string{"oh", "boy", "#hello", "tag#"},
+				Tags:       []string{"#hello tag#"},
+				LastToken:  "tag#",
+				WordString: "oh boy",
+			},
+		},
+		{
+			name: "multiword tag with later text",
+			arg:  "oh boy #hello tag# more text",
+			expected: core.Query{
+				Tokens:     []string{"oh", "boy", "#hello", "tag#", "more", "text"},
+				Tags:       []string{"#hello tag#"},
+				LastToken:  "text",
+				WordString: "oh boy more text",
+			},
+		},
 	}
 
 	for _, test := range tests {

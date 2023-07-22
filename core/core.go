@@ -96,25 +96,63 @@ var spaces = regexp.MustCompile(`\s+`) //nolint:gochecknoglobals
 func ParseQuery(arg string) Query {
 	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
 
+	var words []string
+	var buffer []string
+	tagStarted := false
+	for _, t := range query.Tokens {
+		switch {
+		case strings.HasSuffix(t, "#"):
+			if tagStarted {
+				// Add the token to the buffer and record tag.
+				// #a multiword tag#
+				buffer = append(buffer, t)
+				tag := strings.Join(buffer, " ")
+				query.Tags = append(query.Tags, tag)
+				buffer = nil
+				tagStarted = false
+			} else {
+				words = append(words, t)
+			}
+		case strings.HasPrefix(t, "#"):
+			if tagStarted {
+				// Split the non-tag tokens from previous tag and
+				// restart buffer with new token.
+				// #tag1 some some words #tag2
+				query.Tags = append(query.Tags, buffer[0])
+				words = append(words, buffer[1:]...)
+				buffer = []string{t}
+			} else {
+				buffer = append(buffer, t)
+				tagStarted = true
+			}
+		default:
+			if tagStarted {
+				buffer = append(buffer, t)
+			} else {
+				words = append(words, t)
+			}
+		}
+	}
+	if len(buffer) != 0 {
+		if tagStarted {
+			query.Tags = append(query.Tags, buffer[0])
+			words = append(words, buffer[1:]...)
+		} else {
+			words = append(words, buffer...)
+		}
+	}
+
+	query.LastToken = query.Tokens[len(query.Tokens)-1]
+	query.WordString = strings.TrimSpace(strings.Join(words, " "))
+
+	return query
+}
+
+func ParseQuerySingle(arg string) Query {
+	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
+
 	query.Tags = make([]string, 0, len(query.Tokens))
 	words := make([]string, 0, len(query.Tokens))
-
-	// buffer := []string{}
-	// tagStarted := false
-	// for _, t := range query.Tokens {
-	// 	switch {
-	// 	case strings.HasPrefix(t, "#"):
-	// 		if tagStarted {
-	// 			if strings.HasSuffix(t, "#") {
-	// 				tag := strings.Join()
-	// 			}
-	// 			query.Tags = append(query.Tags, t)
-
-	// 		}
-	// 	default:
-	// 		words = append(words, t)
-	// 	}
-	// }
 
 	for _, t := range query.Tokens {
 		switch {
