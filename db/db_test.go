@@ -21,6 +21,10 @@ func TestRemoveTagHashes(t *testing.T) {
 			tag:      "#multi word#",
 			expected: "multi word",
 		},
+		{
+			tag:      "#multi word long#",
+			expected: "multi word long",
+		},
 	}
 
 	for _, test := range tests {

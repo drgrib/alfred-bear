@@ -240,7 +240,7 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 	if len(query.Tags) != 0 {
 		bareTags := []string{}
 		for _, t := range query.Tags {
-			bareTags = append(bareTags, url.PathEscape(t[1:]))
+			bareTags = append(bareTags, url.PathEscape(db.RemoveTagHashes(t)))
 		}
 		callback = append(callback, "tags="+strings.Join(bareTags, ","))
 	}
@@ -277,7 +277,7 @@ func getSearchCallbackString(query Query) string {
 	}
 
 	if len(query.Tags) != 0 {
-		callback = append(callback, "tag="+query.Tags[0][1:])
+		callback = append(callback, "tag="+db.RemoveTagHashes(query.Tags[0]))
 	}
 
 	return strings.Join(callback, "&")

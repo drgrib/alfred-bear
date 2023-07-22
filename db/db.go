@@ -284,8 +284,10 @@ func RemoveTagHashes(tag string) string {
 func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note, error) {
 	tagConditions := []string{}
 	for _, t := range tags {
-		c := fmt.Sprintf("utflower(tag.ZTITLE) = utflower('%s')",
-			RemoveTagHashes(t))
+		c := fmt.Sprintf(
+			"utflower(tag.ZTITLE) = utflower('%s')",
+			RemoveTagHashes(t),
+		)
 		tagConditions = append(tagConditions, c)
 	}
 	tagConjunction := strings.Join(tagConditions, " OR ")
