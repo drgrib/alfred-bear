@@ -180,7 +180,7 @@ func AutocompleteSpecial(litedb db.LiteDB, query Query) (bool, error) {
 
 func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 	if strings.HasPrefix(query.LastToken, "#") {
-		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, query.LastToken[1:]))
+		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, db.RemoveTagHashes(query.LastToken)))
 		if err != nil {
 			return false, err
 		}
