@@ -148,27 +148,6 @@ func ParseQuery(arg string) Query {
 	return query
 }
 
-func ParseQuerySingle(arg string) Query {
-	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
-
-	query.Tags = make([]string, 0, len(query.Tokens))
-	words := make([]string, 0, len(query.Tokens))
-
-	for _, t := range query.Tokens {
-		switch {
-		case strings.HasPrefix(t, "#"):
-			query.Tags = append(query.Tags, t)
-		default:
-			words = append(words, t)
-		}
-	}
-
-	query.LastToken = query.Tokens[len(query.Tokens)-1]
-	query.WordString = strings.TrimSpace(strings.Join(words, " "))
-
-	return query
-}
-
 func Autocomplete(litedb db.LiteDB, query Query) (bool, error) {
 	autocompleted, err := AutocompleteTags(litedb, query)
 	if err != nil {
