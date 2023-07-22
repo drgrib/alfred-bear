@@ -51,6 +51,10 @@ func getUniqueTagString(tagString string) string {
 			}
 		}
 		if !isPrefix {
+			// Multiword tag.
+			if strings.Contains(t, " ") {
+				t += "#"
+			}
 			uniqueTags = append(uniqueTags, t)
 		}
 	}
@@ -96,15 +100,49 @@ var spaces = regexp.MustCompile(`\s+`) //nolint:gochecknoglobals
 func ParseQuery(arg string) Query {
 	query := Query{Tokens: spaces.Split(norm.NFC.String(arg), -1)}
 
-	query.Tags = make([]string, 0, len(query.Tokens))
-	words := make([]string, 0, len(query.Tokens))
-
-	for _, e := range query.Tokens {
+	var words []string
+	var buffer []string
+	tagStarted := false
+	for _, t := range query.Tokens {
 		switch {
-		case strings.HasPrefix(e, "#"):
-			query.Tags = append(query.Tags, e)
+		case strings.HasSuffix(t, "#"):
+			if tagStarted {
+				// Add the token to the buffer and record tag.
+				// #a multiword tag#
+				buffer = append(buffer, t)
+				tag := strings.Join(buffer, " ")
+				query.Tags = append(query.Tags, tag)
+				buffer = nil
+				tagStarted = false
+			} else {
+				words = append(words, t)
+			}
+		case strings.HasPrefix(t, "#"):
+			if tagStarted {
+				// Split the non-tag tokens from previous tag and
+				// restart buffer with new token.
+				// #tag1 some some words #tag2
+				query.Tags = append(query.Tags, buffer[0])
+				words = append(words, buffer[1:]...)
+				buffer = []string{t}
+			} else {
+				buffer = append(buffer, t)
+				tagStarted = true
+			}
 		default:
-			words = append(words, e)
+			if tagStarted {
+				buffer = append(buffer, t)
+			} else {
+				words = append(words, t)
+			}
+		}
+	}
+	if len(buffer) != 0 {
+		if tagStarted {
+			query.Tags = append(query.Tags, buffer[0])
+			words = append(words, buffer[1:]...)
+		} else {
+			words = append(words, buffer...)
 		}
 	}
 
@@ -163,13 +201,16 @@ func AutocompleteSpecial(litedb db.LiteDB, query Query) (bool, error) {
 
 func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 	if strings.HasPrefix(query.LastToken, "#") {
-		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, query.LastToken[1:]))
+		rows, err := litedb.Query(fmt.Sprintf(db.TAGS_BY_TITLE, db.RemoveTagHashes(query.LastToken)))
 		if err != nil {
 			return false, err
 		}
 
 		for _, row := range rows {
 			tag := "#" + row[db.TitleKey]
+			if strings.Contains(tag, " ") {
+				tag += "#"
+			}
 			autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + tag + " "
 			alfred.Add(alfred.Item{
 				Title:        tag,
@@ -220,7 +261,7 @@ func GetCreateItem(query Query) (*alfred.Item, error) {
 	if len(query.Tags) != 0 {
 		bareTags := []string{}
 		for _, t := range query.Tags {
-			bareTags = append(bareTags, url.PathEscape(t[1:]))
+			bareTags = append(bareTags, url.PathEscape(db.RemoveTagHashes(t)))
 		}
 		callback = append(callback, "tags="+strings.Join(bareTags, ","))
 	}
@@ -257,7 +298,7 @@ func getSearchCallbackString(query Query) string {
 	}
 
 	if len(query.Tags) != 0 {
-		callback = append(callback, "tag="+query.Tags[0][1:])
+		callback = append(callback, "tag="+db.RemoveTagHashes(query.Tags[0]))
 	}
 
 	return strings.Join(callback, "&")
