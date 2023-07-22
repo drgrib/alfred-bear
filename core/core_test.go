@@ -3,8 +3,9 @@ package core_test
 import (
 	"testing"
 
+	"github.com/smartystreets/assertions"
+
 	"github.com/drgrib/alfred-bear/core"
-	. "github.com/smartystreets/assertions"
 )
 
 func TestParseQuery(t *testing.T) {
@@ -84,7 +85,12 @@ func TestParseQuery(t *testing.T) {
 	for _, test := range tests {
 		// nolint: scopelint
 		t.Run(test.name, func(t *testing.T) {
-			if ok, msg := So(core.ParseQuery(test.arg), ShouldResemble, test.expected); !ok {
+			ok, msg := assertions.So(
+				core.ParseQuery(test.arg),
+				assertions.ShouldResemble,
+				test.expected,
+			)
+			if !ok {
 				t.Error(msg)
 			}
 		})

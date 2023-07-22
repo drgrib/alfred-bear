@@ -273,10 +273,19 @@ func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction stri
 	return litedb.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, text, text, len(tags), text))
 }
 
+func RemoveTagHashes(tag string) string {
+	tag = tag[1:]
+	if strings.HasSuffix(tag, "#") {
+		tag = tag[:len(tag)-1]
+	}
+	return tag
+}
+
 func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note, error) {
 	tagConditions := []string{}
 	for _, t := range tags {
-		c := fmt.Sprintf("utflower(tag.ZTITLE) = utflower('%s')", t[1:])
+		c := fmt.Sprintf("utflower(tag.ZTITLE) = utflower('%s')",
+			RemoveTagHashes(t))
 		tagConditions = append(tagConditions, c)
 	}
 	tagConjunction := strings.Join(tagConditions, " OR ")

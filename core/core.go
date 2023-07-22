@@ -99,12 +99,29 @@ func ParseQuery(arg string) Query {
 	query.Tags = make([]string, 0, len(query.Tokens))
 	words := make([]string, 0, len(query.Tokens))
 
-	for _, e := range query.Tokens {
+	// buffer := []string{}
+	// tagStarted := false
+	// for _, t := range query.Tokens {
+	// 	switch {
+	// 	case strings.HasPrefix(t, "#"):
+	// 		if tagStarted {
+	// 			if strings.HasSuffix(t, "#") {
+	// 				tag := strings.Join()
+	// 			}
+	// 			query.Tags = append(query.Tags, t)
+
+	// 		}
+	// 	default:
+	// 		words = append(words, t)
+	// 	}
+	// }
+
+	for _, t := range query.Tokens {
 		switch {
-		case strings.HasPrefix(e, "#"):
-			query.Tags = append(query.Tags, e)
+		case strings.HasPrefix(t, "#"):
+			query.Tags = append(query.Tags, t)
 		default:
-			words = append(words, e)
+			words = append(words, t)
 		}
 	}
 
@@ -170,6 +187,9 @@ func AutocompleteTags(litedb db.LiteDB, query Query) (bool, error) {
 
 		for _, row := range rows {
 			tag := "#" + row[db.TitleKey]
+			if strings.Contains(tag, " ") {
+				tag += "#"
+			}
 			autocomplete := strings.Join(query.Tokens[:len(query.Tokens)-1], " ") + " " + tag + " "
 			alfred.Add(alfred.Item{
 				Title:        tag,
