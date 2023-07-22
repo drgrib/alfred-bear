@@ -51,6 +51,10 @@ func getUniqueTagString(tagString string) string {
 			}
 		}
 		if !isPrefix {
+			// Multiword tag.
+			if strings.Contains(t, " ") {
+				t += "#"
+			}
 			uniqueTags = append(uniqueTags, t)
 		}
 	}
