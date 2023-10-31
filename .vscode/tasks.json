@@ -12,6 +12,7 @@
                 "go build toc",
                 "go build create",
                 "go build setcursor",
+                "go build wiki-link",
             ],
             "group": "build"
         },
@@ -87,6 +88,19 @@
                 "cwd": "${workspaceFolder}/cmd/setcursor"
             },
             "command": "rm -f setcursor; go build",
+            "presentation": {
+                "focus": true,
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "go build wiki-link",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/cmd/wiki-link"
+            },
+            "command": "rm -f wiki-link; go build",
             "presentation": {
                 "focus": true,
             },
