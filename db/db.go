@@ -102,7 +102,7 @@ WHERE
             Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
         INNER JOIN
             ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
-        INNER JOIN
+        LEFT JOIN
             ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
         WHERE
             note.ZARCHIVED = 0
