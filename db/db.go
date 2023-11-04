@@ -55,13 +55,23 @@ LEFT JOIN
 LEFT JOIN
     ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
 WHERE
-    note.ZARCHIVED = 0
-    AND note.ZTRASHED = 0
-    AND note.ZTEXT IS NOT NULL
-    AND (
-        utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
-        utflower(note.ZTEXT) LIKE utflower('%'||$1||'%')
-    )
+	note.ZUNIQUEIDENTIFIER IN (
+		SELECT
+			note.ZUNIQUEIDENTIFIER
+		FROM
+			ZSFNOTE note
+		LEFT JOIN
+			ZSFNOTEFILE file ON file.ZNOTE = note.Z_PK
+		WHERE
+			note.ZARCHIVED = 0
+			AND note.ZTRASHED = 0
+			AND note.ZTEXT IS NOT NULL
+			AND (
+				utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
+				utflower(note.ZTEXT) LIKE utflower('%'||$1||'%') OR
+				file.ZSEARCHTEXT LIKE utflower('%'||$1||'%')
+			)
+	)
 GROUP BY
     note.ZUNIQUEIDENTIFIER,
     note.ZTITLE
@@ -92,6 +102,8 @@ WHERE
             Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
         INNER JOIN
             ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+        INNER JOIN
+            ZSFNOTEFILE file ON file.ZNOTE = note.Z_PK
         WHERE
             note.ZARCHIVED = 0
             AND note.ZTRASHED = 0
@@ -99,7 +111,8 @@ WHERE
             AND (%s)
             AND (
                 utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-                utflower(note.ZTEXT) LIKE utflower('%%%s%%')
+                utflower(note.ZTEXT) LIKE utflower('%%%s%%') OR
+                file.ZSEARCHTEXT LIKE utflower('%%%s%%')
             )
         GROUP BY
             note.ZUNIQUEIDENTIFIER
@@ -270,7 +283,7 @@ func containsWords(text string, words []string) bool {
 
 func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction string, tags []string) ([]Note, error) {
 	text = escape(text)
-	return litedb.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, text, text, len(tags), text))
+	return litedb.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, text, text, text, len(tags), text))
 }
 
 func RemoveTagHashes(tag string) string {
