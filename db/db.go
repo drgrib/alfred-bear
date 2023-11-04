@@ -61,7 +61,7 @@ WHERE
 		FROM
 			ZSFNOTE note
 		LEFT JOIN
-			ZSFNOTEFILE file ON file.ZNOTE = note.Z_PK
+			ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
 		WHERE
 			note.ZARCHIVED = 0
 			AND note.ZTRASHED = 0
@@ -69,7 +69,7 @@ WHERE
 			AND (
 				utflower(note.ZTITLE) LIKE utflower('%'||$1||'%') OR
 				utflower(note.ZTEXT) LIKE utflower('%'||$1||'%') OR
-				file.ZSEARCHTEXT LIKE utflower('%'||$1||'%')
+				images.ZSEARCHTEXT LIKE utflower('%'||$1||'%')
 			)
 	)
 GROUP BY
@@ -103,7 +103,7 @@ WHERE
         INNER JOIN
             ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
         INNER JOIN
-            ZSFNOTEFILE file ON file.ZNOTE = note.Z_PK
+            ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
         WHERE
             note.ZARCHIVED = 0
             AND note.ZTRASHED = 0
@@ -112,7 +112,7 @@ WHERE
             AND (
                 utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
                 utflower(note.ZTEXT) LIKE utflower('%%%s%%') OR
-                file.ZSEARCHTEXT LIKE utflower('%%%s%%')
+                images.ZSEARCHTEXT LIKE utflower('%%%s%%')
             )
         GROUP BY
             note.ZUNIQUEIDENTIFIER

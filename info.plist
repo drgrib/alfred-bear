@@ -746,11 +746,11 @@
 				<key>focusedappvariablename</key>
 				<string></string>
 				<key>hotkey</key>
-				<integer>0</integer>
+				<integer>45</integer>
 				<key>hotmod</key>
-				<integer>0</integer>
+				<integer>524288</integer>
 				<key>hotstring</key>
-				<string></string>
+				<string>B</string>
 				<key>leftcursor</key>
 				<false/>
 				<key>modsmode</key>
@@ -2027,7 +2027,7 @@
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.2.2</string>
+	<string>1.2.3</string>
 	<key>webaddress</key>
 	<string>https://github.com/drgrib/alfred-bear</string>
 </dict>
