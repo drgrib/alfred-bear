@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
 	"os/user"
@@ -8,6 +9,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
@@ -81,97 +83,51 @@ ORDER BY
 LIMIT 200
 `
 
-	NOTES_BY_TAGS_AND_QUERY_OLD = `
-SELECT
-    note.ZUNIQUEIDENTIFIER,
-    note.ZTITLE,
-    GROUP_CONCAT(tag.ZTITLE) AS TAGS
-FROM
-    ZSFNOTE note
-INNER JOIN
-    Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
-INNER JOIN
-    ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
-WHERE
-    note.ZUNIQUEIDENTIFIER IN (
-        SELECT
-            note.ZUNIQUEIDENTIFIER
-        FROM
-            ZSFNOTE note
-        INNER JOIN
-            Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
-        INNER JOIN
-            ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
-        LEFT JOIN
-            ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
-        WHERE
-            note.ZARCHIVED = 0
-            AND note.ZTRASHED = 0
-            AND note.ZTEXT IS NOT NULL
-            AND (%s)
-            AND (
-                utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-                utflower(note.ZTEXT) LIKE utflower('%%%s%%') OR
-                images.ZSEARCHTEXT LIKE utflower('%%%s%%')
-            )
-        GROUP BY
-            note.ZUNIQUEIDENTIFIER
-        HAVING
-            COUNT(*) >= %d
-    )
-GROUP BY
-    note.ZUNIQUEIDENTIFIER,
-    note.ZTITLE
-ORDER BY
-    CASE WHEN utflower(note.ZTITLE) LIKE utflower('%%%s%%') THEN 0 ELSE 1 END,
-    note.ZMODIFICATIONDATE DESC
-LIMIT 200
-`
-
 	NOTES_BY_TAGS_AND_QUERY = `
+WITH 
+	joined AS (
+		SELECT
+			note.ZUNIQUEIDENTIFIER,
+			note.ZTITLE,
+			note.ZTEXT,
+			note.ZMODIFICATIONDATE,
+			tag.ZTITLE AS TAG_TITLE,
+			images.ZSEARCHTEXT
+		FROM
+			ZSFNOTE note
+		INNER JOIN
+			Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+		INNER JOIN
+			ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+		LEFT JOIN
+			ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
+		WHERE
+			note.ZARCHIVED = 0
+			AND note.ZTRASHED = 0
+			AND note.ZTEXT IS NOT NULL
+	),
+	hasSearchedTags AS (
+		{{ .TagIntersection}}
+	)
 SELECT
-    note.ZUNIQUEIDENTIFIER,
-    note.ZTITLE,
-    GROUP_CONCAT(tag.ZTITLE) AS TAGS
+	ZUNIQUEIDENTIFIER,
+	ZTITLE,
+	GROUP_CONCAT(DISTINCT TAG_TITLE) AS TAGS
 FROM
-    ZSFNOTE note
-INNER JOIN
-    Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
-INNER JOIN
-    ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+	joined
 WHERE
-    note.ZUNIQUEIDENTIFIER IN (
-        SELECT
-            note.ZUNIQUEIDENTIFIER
-        FROM
-            ZSFNOTE note
-        INNER JOIN
-            Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
-        INNER JOIN
-            ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
-        LEFT JOIN
-            ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
-        WHERE
-            note.ZARCHIVED = 0
-            AND note.ZTRASHED = 0
-            AND note.ZTEXT IS NOT NULL
-            AND (%s)
-            AND (
-                utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
-                utflower(note.ZTEXT) LIKE utflower('%%%s%%') OR
-                images.ZSEARCHTEXT LIKE utflower('%%%s%%')
-            )
-        GROUP BY
-            note.ZUNIQUEIDENTIFIER
-        HAVING
-            COUNT(*) >= %d
-    )
+	ZUNIQUEIDENTIFIER IN hasSearchedTags 
+	AND (
+		utflower(ZTITLE) LIKE utflower('%{{ .Text}}%') OR
+		utflower(ZTEXT) LIKE utflower('%{{ .Text}}%') OR
+		ZSEARCHTEXT LIKE utflower('%{{ .Text}}%')
+	)
 GROUP BY
-    note.ZUNIQUEIDENTIFIER,
-    note.ZTITLE
+	ZUNIQUEIDENTIFIER,
+	ZTITLE
 ORDER BY
-    CASE WHEN utflower(note.ZTITLE) LIKE utflower('%%%s%%') THEN 0 ELSE 1 END,
-    note.ZMODIFICATIONDATE DESC
+	CASE WHEN utflower(ZTITLE) LIKE utflower('%{{ .Text}}%') THEN 0 ELSE 1 END,
+	ZMODIFICATIONDATE DESC
 LIMIT 200
 `
 
@@ -221,6 +177,18 @@ ORDER BY
 LIMIT 25
 `
 )
+
+type TagQueryArg struct {
+	Text            string
+	TagIntersection string
+}
+
+func TemplateToString(templateStr string, data any) (string, error) {
+	var buffer bytes.Buffer
+	t := template.Must(template.New("").Parse(templateStr))
+	err := t.Execute(&buffer, data)
+	return buffer.String(), errors.WithStack(err)
+}
 
 type Note map[string]string
 
@@ -328,9 +296,18 @@ func containsWords(text string, words []string) bool {
 	return true
 }
 
-func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagConjunction string, tags []string) ([]Note, error) {
-	text = escape(text)
-	return litedb.Query(fmt.Sprintf(NOTES_BY_TAGS_AND_QUERY, tagConjunction, text, text, text, len(tags), text))
+func (litedb LiteDB) queryNotesByTextAndTagConjunction(text, tagIntersection string, tags []string) ([]Note, error) {
+	tagQueryArg := TagQueryArg{
+		Text:            escape(text),
+		TagIntersection: tagIntersection,
+	}
+
+	query, err := TemplateToString(NOTES_BY_TAGS_AND_QUERY, tagQueryArg)
+	if err != nil {
+		return nil, err
+	}
+
+	return litedb.Query(query)
 }
 
 func RemoveTagHashes(tag string) string {
@@ -342,18 +319,15 @@ func RemoveTagHashes(tag string) string {
 }
 
 func (litedb LiteDB) QueryNotesByTextAndTags(text string, tags []string) ([]Note, error) {
-	tagConditions := []string{}
+	var selectStatements []string
 	for _, t := range tags {
-		c := fmt.Sprintf(
-			"utflower(tag.ZTITLE) = utflower('%s')",
-			RemoveTagHashes(t),
-		)
-		tagConditions = append(tagConditions, c)
+		s := fmt.Sprintf("SELECT ZUNIQUEIDENTIFIER FROM joined WHERE utflower(TAG_TITLE) = utflower('%s')", RemoveTagHashes(t))
+		selectStatements = append(selectStatements, s)
 	}
-	tagConjunction := strings.Join(tagConditions, " OR ")
+	tagIntersection := strings.Join(selectStatements, "\nINTERSECT\n")
 
 	wordQuery := func(word string) ([]Note, error) {
-		return litedb.queryNotesByTextAndTagConjunction(word, tagConjunction, tags)
+		return litedb.queryNotesByTextAndTagConjunction(word, tagIntersection, tags)
 	}
 
 	return multiWordQuery(text, wordQuery)
