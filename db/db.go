@@ -81,6 +81,53 @@ ORDER BY
 LIMIT 200
 `
 
+	NOTES_BY_TAGS_AND_QUERY_OLD = `
+SELECT
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE,
+    GROUP_CONCAT(tag.ZTITLE) AS TAGS
+FROM
+    ZSFNOTE note
+INNER JOIN
+    Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+INNER JOIN
+    ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+WHERE
+    note.ZUNIQUEIDENTIFIER IN (
+        SELECT
+            note.ZUNIQUEIDENTIFIER
+        FROM
+            ZSFNOTE note
+        INNER JOIN
+            Z_5TAGS nTag ON note.Z_PK = nTag.Z_5NOTES
+        INNER JOIN
+            ZSFNOTETAG tag ON nTag.Z_13TAGS = tag.Z_PK
+        LEFT JOIN
+            ZSFNOTEFILE images ON images.ZNOTE = note.Z_PK
+        WHERE
+            note.ZARCHIVED = 0
+            AND note.ZTRASHED = 0
+            AND note.ZTEXT IS NOT NULL
+            AND (%s)
+            AND (
+                utflower(note.ZTITLE) LIKE utflower('%%%s%%') OR
+                utflower(note.ZTEXT) LIKE utflower('%%%s%%') OR
+                images.ZSEARCHTEXT LIKE utflower('%%%s%%')
+            )
+        GROUP BY
+            note.ZUNIQUEIDENTIFIER
+        HAVING
+            COUNT(*) >= %d
+    )
+GROUP BY
+    note.ZUNIQUEIDENTIFIER,
+    note.ZTITLE
+ORDER BY
+    CASE WHEN utflower(note.ZTITLE) LIKE utflower('%%%s%%') THEN 0 ELSE 1 END,
+    note.ZMODIFICATIONDATE DESC
+LIMIT 200
+`
+
 	NOTES_BY_TAGS_AND_QUERY = `
 SELECT
     note.ZUNIQUEIDENTIFIER,

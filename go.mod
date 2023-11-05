@@ -1,6 +1,6 @@
 module github.com/drgrib/alfred-bear
 
-go 1.13
+go 1.21
 
 require (
 	github.com/atotto/clipboard v0.1.2
