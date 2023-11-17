@@ -8,7 +8,7 @@ Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) 
 
 1. [Download](https://github.com/drgrib/alfred-bear/releases/download/v1.2.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 2. [Authorize all the executables used by the workflow](#authorize-all-executables).
-3. If you are on an Apple Silicon Mac (M1, M2, etc.), [install Rosetta](https://github.com/drgrib/alfred-bear#-apple-silicon-macs)
+3. If you are on an Apple Silicon Mac (M1, M2, etc.), [install Rosetta](https://github.com/drgrib/alfred-bear#install-rosetta)
 
 If you are using an old version of Bear before 2.0 use [this](https://github.com/drgrib/alfred-bear/releases/download/1.1.9/Bear.alfredworkflow) download link for the latest version supporting it.
 
@@ -139,11 +139,9 @@ xattr -rd com.apple.quarantine cmd
 
 This should authorize all the Alfred Bear the executables and fix the security errors.
 
-### 🍎 Apple Silicon Macs
+### Install Rosetta
 
 If your mac is based on Apple Silicon chip, you need to have Rosetta installed on your system, otherwise Alfred workflows will fail silently.
-
-<img width="582" alt="Screen Shot 2021-12-29 at 9 06 02 AM" src="https://user-images.githubusercontent.com/9834975/147670554-eae2ca66-b929-4a03-b59e-545d3e660082.png">
 
 Copy this command and execute in terminal to install Rosetta:
 
