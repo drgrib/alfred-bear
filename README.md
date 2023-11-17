@@ -6,7 +6,11 @@ Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) 
 
 ## Install
 
-Just [download](https://github.com/drgrib/alfred-bear/releases/download/v1.2.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it. To avoid getting blocked from running the workflow by the new macOS security features, you can [authorize all the executables used by the workflow](#authorize-all-executables). If you are using an old version of Bear before 2.0 use [this](https://github.com/drgrib/alfred-bear/releases/download/1.1.9/Bear.alfredworkflow) download link for the latest version supporting it.
+1. [Download](https://github.com/drgrib/alfred-bear/releases/download/v1.2.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+2. [Authorize all the executables used by the workflow](#authorize-all-executables).
+3. If you are on an Apple Silicon Mac (M1, M2, etc.) [install Rosetta](https://github.com/drgrib/alfred-bear#-apple-silicon-macs)
+
+If you are using an old version of Bear before 2.0 use [this](https://github.com/drgrib/alfred-bear/releases/download/1.1.9/Bear.alfredworkflow) download link for the latest version supporting it.
 
 ## Search
 
