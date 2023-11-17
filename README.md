@@ -141,7 +141,7 @@ This should authorize all the Alfred Bear the executables and fix the security e
 
 ## Install Rosetta
 
-If your mac is based on Apple Silicon chip, you need to have Rosetta installed on your system, otherwise Alfred workflows will fail silently.
+If your mac is based on an Apple Silicon chip (M1, M2, etc.), you need to have Rosetta installed on your system, otherwise Alfred workflows will fail silently.
 
 Copy this command and execute in terminal to install Rosetta:
 
