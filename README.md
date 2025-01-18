@@ -148,3 +148,9 @@ Copy this command and execute in terminal to install Rosetta:
 ```sh
 softwareupdate --install-rosetta
 ```
+
+If that fails, try this version, which requires your admin password:
+
+```
+sudo softwareupdate --install-rosetta --agree-to-license
+```
