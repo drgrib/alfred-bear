@@ -141,7 +141,7 @@ This should authorize all the Alfred Bear the executables and fix the security e
 
 If you are trying to use the Bear workflow loaded from prefrences via cloud (e.g. through Google Drive) on a new Mac, you may also need to run this command, which will make the executables executable:
 ```
-find ./cmd -depth -type f \! -perm -u+x -exec chmod +x {} \;
+find ./cmd -maxdepth 3 -type f \( -perm +111 -o -perm +101 -o -perm +011 \) \! -name "*.go" -exec chmod +x {} \;
 ```
 
 ## Install Rosetta
