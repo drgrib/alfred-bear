@@ -139,6 +139,11 @@ xattr -rd com.apple.quarantine cmd
 
 This should authorize all the Alfred Bear the executables and fix the security errors.
 
+If you are trying to use the Bear workflow loaded from prefrences via cloud (e.g. through Google Drive) on a new Mac, you may also need to run this command, which will make the executables executable:
+```
+find ./cmd -depth -type f \! -perm -u+x -exec chmod +x {} \;
+```
+
 ## Install Rosetta
 
 If your mac is based on an Apple Silicon chip (M1, M2, etc.), you need to have Rosetta installed on your system, otherwise Alfred workflows will fail silently.
