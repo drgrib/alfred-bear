@@ -60,14 +60,6 @@ You can search any _query_ you type in the Bear app's main window by holding dow
 
 <img src="doc/SearchQueryInBearApp.png" width="500">
 
-The workflow will also autocomplete any of Bear's [Special Search keywords](https://bear.app/faq/Advanced%20search%20options%20in%20Bear/) if you start typing `@` or `-@`.
-
-<img src="doc/SpecialSearchAutocomplete.png" width="500">
-
-If you use these keywords and have no other search results, the workflow will automatically populate a "Search ... in Bear App" item without you needing to press option.
-
-<img src="doc/SearchSpecialInBearApp.png" width="500">
-
 ### Open Note in Bear App
 
 Similarly, you can open any _note_ you select in the Bear app's main window by holding down the command key.
