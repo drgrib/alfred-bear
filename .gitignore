@@ -6,3 +6,4 @@ cmd/search/search
 cmd/setcursor/setcursor
 cmd/toc/toc
 cmd/wiki-link/wiki-link
+*.alfredworkflow
