@@ -1,4 +1,6 @@
 .DS_Store
+**/._*
+prefs.plist
 cmd/create/create
 cmd/csearch/csearch
 cmd/link/link

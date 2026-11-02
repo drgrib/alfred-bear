@@ -6,9 +6,10 @@ Streamlined note searching and creation for [Bear](http://www.bear-writer.com/) 
 
 ## Install
 
-1. [Download](https://github.com/drgrib/alfred-bear/releases/download/v1.2.4/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
+1. [Download](https://github.com/drgrib/alfred-bear/releases/latest/download/Bear.alfredworkflow) the latest release and double-click _Bear.alfredworkflow_. Alfred will open the workflow and install it.
 2. [Authorize all the executables used by the workflow](#authorize-all-executables).
-3. If you are on an Apple Silicon Mac (M1, M2, etc.), [install Rosetta](https://github.com/drgrib/alfred-bear#install-rosetta)
+
+If you are on an Intel Mac, use [this](https://github.com/drgrib/alfred-bear/releases/download/v1.2.4/Bear.alfredworkflow) download link for the last Intel-compatible version.
 
 If you are using an old version of Bear before 2.0 use [this](https://github.com/drgrib/alfred-bear/releases/download/1.1.9/Bear.alfredworkflow) download link for the latest version supporting it.
 
@@ -137,6 +138,8 @@ find . -mindepth 3 -maxdepth 3 -type f \! -name "*.go" -exec chmod +x {} \;
 ```
 
 ## Install Rosetta
+
+> Note: `v1.2.5` and later run natively on Apple Silicon and do not require Rosetta. The steps below only apply to `v1.2.4` and earlier.
 
 If your mac is based on an Apple Silicon chip (M1, M2, etc.), you need to have Rosetta installed on your system, otherwise Alfred workflows will fail silently.
 
